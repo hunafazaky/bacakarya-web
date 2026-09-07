@@ -93,10 +93,7 @@
                 v-model="fileOfCover"
                 @change="fileToImage"
               ></v-file-input>
-              <v-btn-toggle
-                v-model="attachment_type"
-                class="mb-2"
-              >
+              <v-btn-toggle v-model="attachment_type" class="mb-2">
                 <v-btn>
                   <v-icon>mdi-link-box</v-icon>
                 </v-btn>
@@ -104,13 +101,8 @@
                   <v-icon>mdi-file-pdf-box</v-icon>
                 </v-btn>
               </v-btn-toggle>
-              <v-row
-                v-if="attachment_type === 0"
-              >
-                <v-col
-                  cols="12"
-                  sm="5"
-                >
+              <v-row v-if="attachment_type === 0">
+                <v-col cols="12" sm="5">
                   <v-text-field
                     outlined
                     dense
@@ -118,10 +110,7 @@
                     v-model="work.attachment.title"
                   ></v-text-field>
                 </v-col>
-                <v-col
-                  cols="12"
-                  sm="7"
-                >                  
+                <v-col cols="12" sm="7">
                   <v-text-field
                     outlined
                     dense
@@ -146,8 +135,8 @@
                 hint="Lampirkan file PDF (Optional)"
                 persistent-hint
                 v-model="fileOfAttachment"
-                ></v-file-input>
-                <!-- @change="fileToLink" -->
+              ></v-file-input>
+              <!-- @change="fileToLink" -->
             </v-col>
           </v-row>
           <v-row>
@@ -179,21 +168,32 @@
       >
         Data Berhasil Dikirim
       </v-alert>
+      <v-alert
+        class="mb-0"
+        type="error"
+        transition="slide-y-transition"
+        :value="!!errorMessage"
+      >
+        {{ errorMessage }}
+      </v-alert>
     </v-col>
   </v-row>
 </template>
 
 <script>
 import TiptapEditor from '~/components/TiptapEditor.vue'
+import currentUser from '../mixins/currentUser'
 
 export default {
   name: 'Write',
+  middleware: 'auth',
+  mixins: [currentUser],
   data: () => ({
-    // me: {},
     loading: false,
     fileOfCover: null,
     fileOfAttachment: null,
     success: false,
+    errorMessage: '',
     work: {
       title: null,
       cover: null,
@@ -205,20 +205,6 @@ export default {
     attachment_type: null,
   }),
   computed: {
-    height() {
-      switch (this.$vuetify.breakpoint.name) {
-        case 'xs':
-          return 220
-        case 'sm':
-          return 400
-        case 'md':
-          return 500
-        case 'lg':
-          return 600
-        case 'xl':
-          return 800
-      }
-    },
     hashtags() {
       const hashtags = []
       this.$store.state.hashtags.data.forEach((element) => {
@@ -226,132 +212,78 @@ export default {
       })
       return hashtags
     },
-    me() {
-      if (this.$store.getters['me']) {
-        return this.$store.getters['me'];
-      } else {
-        this.$router.push('/');
-        return []; 
-      }
-    },
   },
   methods: {
     async uploadFileToStorage(file) {
-      const storageRef = this.$fireModule.storage().ref();
-      const fileRef = storageRef.child(file.name);
+      const storageRef = this.$fireModule.storage().ref()
+      // Namespace by timestamp so two uploads with the same filename (e.g.
+      // "cover.jpg" from two different users) don't overwrite each other.
+      const fileRef = storageRef.child(`${Date.now()}-${file.name}`)
       try {
-        // Upload file to Firebase Storage
-        await fileRef.put(file);
-
-        // Get download URL
-        return fileRef.getDownloadURL();
+        await fileRef.put(file)
+        return fileRef.getDownloadURL()
       } catch (error) {
-        console.error('Error uploading file:', error);
-        throw error;
+        console.error('Error uploading file:', error)
+        throw error
       }
     },
     async postWork() {
-      this.loading = true;
+      this.loading = true
+      this.errorMessage = ''
       try {
-        this.work.writer = this.me.id;
-        
+        this.work.writer = this.me.id
+
         // Upload cover
         if (this.fileOfCover) {
-          this.work.cover = await this.uploadFileToStorage(this.fileOfCover);
+          this.work.cover = await this.uploadFileToStorage(this.fileOfCover)
         } else {
-          this.work.cover = '/temp-profile.webp';
+          this.work.cover = '/temp-profile.webp'
         }
 
         // Upload attachment
         if (this.fileOfAttachment) {
-          const attachmentLink = await this.uploadFileToStorage(this.fileOfAttachment);
-          this.work.attachment = { title: this.fileOfAttachment.name, link: attachmentLink };
+          const attachmentLink = await this.uploadFileToStorage(
+            this.fileOfAttachment,
+          )
+          this.work.attachment = {
+            title: this.fileOfAttachment.name,
+            link: attachmentLink,
+          }
         } else if (this.work.attachment.link) {
           if (!this.work.attachment.title) {
             this.work.attachment.title = 'Lampiran'
           }
         } else {
-          this.work.attachment = {};
+          this.work.attachment = {}
         }
 
-        // Dispatch postWork action
-        await this.$store.dispatch('postWork', this.work);
+        await this.$store.dispatch('postWork', this.work)
 
-        // Handle success
-        this.success = true;
+        this.success = true
         setTimeout(() => {
-          this.$router.push('/home');
-        }, 1000);
-        // console.log('File uploaded. Download URL:', this.work.cover);
+          this.$router.push('/home')
+        }, 1000)
       } catch (error) {
-        console.error('Error uploading work:', error);
+        console.error('Error uploading work:', error)
+        this.errorMessage = 'Gagal mengunggah karya tulis. Silakan coba lagi.'
+      } finally {
+        this.loading = false
       }
     },
-
-// Usage
-// this.uploadWork();
-    // async postWork() {
-    //   const file = this.fileOfCover;
-    //   const storageRef = this.$fireModule.storage().ref();
-    //   const fileRef = storageRef.child(file.name);
-    //   const fileRef2 = storageRef.child(this.fileOfAttachment.name);
-
-    //   try {
-    //     // Upload file to Firebase Storage
-    //     await fileRef.put(file);
-
-    //     // Get download URL
-    //     const downloadURL = await fileRef.getDownloadURL();
-    //     this.work.cover = downloadURL;
-    //     this.work.writer = this.me.id;
-    //     if (this.work.cover === null) this.work.cover = '/temp-profile.webp';
-    //     if (this.attachment_type === 1) {
-    //       await fileRef2.put(this.fileOfAttachment);
-    //       const link = await fileRef2.getDownloadURL();
-    //       this.work.attachment = {
-    //         title: this.fileOfAttachment.name, link
-    //       }
-    //     }
-    //     this.$store.dispatch('postWork', this.work).then((data) => {
-    //       // this.works = this.$store.getters['works'];
-    //       // this.loading = false;
-    //       this.success = true
-    //       setTimeout(() => {
-    //         this.$router.push('/home')
-    //       }, 2000)
-    //     });
-    //     console.log('File uploaded. Download URL:', downloadURL);
-    //   } catch (error) {
-    //     console.error('Error uploading file:', error);
-    //   }
-    //   // this.$axios
-    //   //   .post(`/works`, this.work)
-    //   //   // .then((data) => {
-    //   //   //   this.me.activity.writings.push({
-    //   //   //     id: data.id,
-    //   //   //     createdAt: data.createdAt,
-    //   //   //     updatedAt: data.updatedAt
-    //   //   //   })
-    //   //   //   this.$axios.put(`/users/${this.me.id}`, this.me);
-    //   //   // })
-    //   //   .then(() => {
-    //   //     this.success = true
-    //   //     setTimeout(() => {
-    //   //       this.$router.push('/home')
-    //   //     }, 2000)
-    //   //   })
-    // },
-    async fileToImage() {
+    fileToImage() {
       if (this.fileOfCover) {
+        if (this.work.cover && this.work.cover.startsWith('blob:')) {
+          URL.revokeObjectURL(this.work.cover)
+        }
         this.work.cover = URL.createObjectURL(this.fileOfCover)
       }
     },
   },
   components: { TiptapEditor },
-  mounted() {
-    // this.getMe()
-    // this.setWrittenBy()
+  beforeDestroy() {
+    if (this.work.cover && this.work.cover.startsWith('blob:')) {
+      URL.revokeObjectURL(this.work.cover)
+    }
   },
-  created() {},
 }
 </script>

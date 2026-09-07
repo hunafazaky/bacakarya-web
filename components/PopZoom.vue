@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-model="showPopZoom" :max-width="maxWidth" persistent>
+  <v-dialog :value="showPopZoom" :max-width="maxWidth" persistent>
     <v-sheet
       @click="$emit('hidePopZoom')"
       outlined
@@ -14,11 +14,10 @@
 <script>
 export default {
   name: 'PopZoom',
-  props: ['maxWidth', 'image', 'showPopZoom'],
-  data() {
-    return {
-      dialog: false,
-    }
+  props: {
+    maxWidth: { type: [String, Number], default: undefined },
+    image: { type: String, default: '' },
+    showPopZoom: { type: Boolean, default: false },
   },
 }
 </script>

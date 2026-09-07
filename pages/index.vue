@@ -1,6 +1,6 @@
 <template>
   <div>
-    <LoadingPage :loading="loading"/>
+    <LoadingPage :loading="loading" />
     <h1 class="text-center ma-4">Reading App</h1>
     <v-row justify="center" align="center">
       <v-col md="6" lg="5" v-if="height >= 500">
@@ -78,15 +78,16 @@
 </style>
 
 <script>
-import LoadingComponent from '../components/LoadingComponent.vue'
 import LoadingPage from '../components/LoadingPage.vue'
+import responsiveHeight from '../mixins/responsiveHeight'
 
 export default {
   layout: 'login',
+  mixins: [responsiveHeight],
   data: () => ({
     user: {
-        username: null,
-        password: null,
+      username: null,
+      password: null,
     },
     loginAttempt: false,
     regisAttempt: false,
@@ -95,26 +96,8 @@ export default {
     loading: false,
   }),
   components: {
-    LoadingComponent,
     LoadingPage,
   },
-  computed: {
-    height() {
-      switch (this.$vuetify.breakpoint.name) {
-        case 'xs':
-          return 220
-        case 'sm':
-          return 400
-        case 'md':
-          return 500
-        case 'lg':
-          return 600
-        case 'xl':
-          return 800
-      }
-    },
-  },
-
   methods: {
     openLoginForm() {
       this.form_title = 'Login'
@@ -123,39 +106,42 @@ export default {
       this.form_title = 'Registrasi'
     },
     login() {
-      this.loading = true;
+      this.loading = true
+      this.loginAttempt = true
       this.$store
-      .dispatch('login', this.user)
-      .then((data) => {
-        // this.loading = false;
-        if (data.id) {
-          this.message = 'Login Berhasil!!';
-          this.loginAttempt = true;
-          this.$router.push('/home');
-        } else {
-          this.message = 'Error: ' + data.message;
-          this.loginAttempt = true;
-          this.loading = false;
-        };
-      })
-      .catch((err) => {
-        alert(err)
-        this.loading = false;
-      });
+        .dispatch('login', this.user)
+        .then((data) => {
+          if (data.id) {
+            this.message = 'Login Berhasil!!'
+            this.$router.push('/home')
+          } else {
+            this.message = 'Error: ' + data.message
+            this.loading = false
+          }
+        })
+        .catch((err) => {
+          this.message = 'Error: ' + (err.message || 'Gagal login')
+          this.loading = false
+        })
     },
     regis() {
-      this.regisAttempt = true;
-      this.loading = true;
+      this.regisAttempt = true
+      this.loading = true
       this.$store
-      .dispatch('regis', this.user)
-      .then((data) => {
-        this.loading = false;
-        if (data.id) {
-          this.message = 'Registrasi Berhasil!!';
-          this.login();
-        } else this.message = 'Error: ' + data.message;
-      })
-      .catch((err) => alert(err));
+        .dispatch('regis', this.user)
+        .then((data) => {
+          if (data.id) {
+            this.message = 'Registrasi Berhasil!!'
+            this.login()
+          } else {
+            this.message = 'Error: ' + data.message
+            this.loading = false
+          }
+        })
+        .catch((err) => {
+          this.message = 'Error: ' + (err.message || 'Gagal registrasi')
+          this.loading = false
+        })
     },
   },
 }

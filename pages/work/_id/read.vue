@@ -1,20 +1,22 @@
 <template>
   <div>
-    <LoadingPage :loading="loading"/>
-    <v-row justify="space-between">
+    <LoadingPage :loading="loading" />
+    <v-row justify="space-between" v-if="work">
       <PopZoom
         maxWidth="500px"
-        :image="work?.cover"
+        :image="work.cover"
         :showPopZoom="showPopZoom"
         @hidePopZoom="showPopZoom = false"
       />
       <v-col class="my-5" cols="12" md="7">
         <h1
           class="headline font-weight-medium text--secondary"
-          v-text="work?.title"
+          v-text="work.title"
         ></h1>
-        <p class="subtitle-1 my-5" v-html="work?.text"></p>
-        <!-- <a class="subtitle-1 my-5 text-decoration-none" :href="work?.attachment.link" target="_blank" v-html="work?.attachment.title"></a> -->
+        <!-- SECURITY TODO (deferred): this is raw HTML from the editor with no
+             sanitization. Fine while it's just us testing, but run it through
+             something like DOMPurify before there's real user-generated content. -->
+        <p class="subtitle-1 my-5" v-html="work.text"></p>
       </v-col>
       <v-col class="my-5" cols="12" md="4">
         <v-card rounded="lg" outlined>
@@ -36,55 +38,58 @@
                     style="inset: 0; position: absolute"
                     height="100%"
                     cover
-                    :src="work?.cover"
+                    :src="work.cover"
                   ></v-img>
                 </v-sheet>
               </v-col>
               <v-col sm="6" md="12">
-                <div class="my-5">
+                <div class="my-5" v-if="work.writer">
                   <p class="caption font-weight-bold my-0">Penulis :</p>
                   <nuxt-link
-                    :to="`../../user/${work?.writer.username}`"
+                    :to="`/user/${work.writer.username}`"
                     class="text-decoration-none"
                   >
                     <div
                       class="caption text-truncate text-capitalize font-weight-medium"
-                      v-text="work?.writer.pen_name"
+                      v-text="work.writer.pen_name"
                     ></div>
                   </nuxt-link>
                 </div>
-                <div class="my-5">
+                <div
+                  class="my-5"
+                  v-if="work.category && work.category.length > 0"
+                >
                   <p class="caption font-weight-bold my-0">Kategori :</p>
                   <span
+                    v-for="category in work.category"
+                    :key="category"
                     class="overline font-weight-bold"
-                    v-for="category in work?.category"
                   >
-                  #{{ category }}
+                    #{{ category }}
                   </span>
                 </div>
-                <div class="my-5" v-if="work?.attachment">
+                <div
+                  class="my-5"
+                  v-if="work.attachment && work.attachment.link"
+                >
                   <p class="caption font-weight-bold my-0">Lampiran :</p>
                   <v-btn
                     color="error"
                     class="my-2 white--text truncate"
                     block
                     :max-width="150"
-                    @click="openLink(work?.attachment.link)"
+                    @click="openLink(work.attachment.link)"
                   >
-                    <v-icon
-                      left
-                      dark
-                    >
-                      mdi-file-pdf-box
-                    </v-icon>
-                    <span class="text-truncate" style="max-width:150px">
-                      
-                      {{ work?.attachment.title }}
+                    <v-icon left dark>mdi-file-pdf-box</v-icon>
+                    <span class="text-truncate" style="max-width: 150px">
+                      {{ work.attachment.title }}
                     </span>
                   </v-btn>
                 </div>
                 <div class="my-5">
-                  <p class="caption font-weight-bold my-0">Berikan Penilaian Anda</p>
+                  <p class="caption font-weight-bold my-0">
+                    Berikan Penilaian Anda
+                  </p>
                   <v-rating
                     hover
                     :length="5"
@@ -93,22 +98,6 @@
                     @input="sendRating"
                   />
                 </div>
-                <!-- <div class="my-5" v-if="work?.keyword.hashtags.length > 0">
-                  <p class="caption font-weight-bold my-0">Tagar :</p>
-                  <v-chip-group column class="mb-4">
-                    <v-chip
-                      label
-                      small
-                      color="grey darken-4"
-                      class="font-weight-medium white--text"
-                      v-for="hashtag in work?.keyword.hashtags"
-                      :key="hashtag"
-                    >
-                      <v-icon small left>mdi-pound</v-icon>
-                      <span class="text-capitalize" v-text="hashtag"></span>
-                    </v-chip>
-                  </v-chip-group>
-                </div> -->
               </v-col>
             </v-row>
           </v-card-text>
@@ -119,90 +108,65 @@
 </template>
 
 <script>
-import PopZoom from '../../../components/PopZoom.vue'
-import LoadingPage from '../../../components/LoadingPage.vue'
+import PopZoom from '~/components/PopZoom.vue'
+import LoadingPage from '~/components/LoadingPage.vue'
+import currentUser from '~/mixins/currentUser'
 
 export default {
   name: 'Read',
+  middleware: 'auth',
+  mixins: [currentUser],
   data: () => ({
-    me: {},
     showPopZoom: false,
     loading: true,
-    rating: null
+    rating: null,
   }),
   computed: {
     work() {
-      if (this.$store.getters['work']) {
-        // const work = 
-        this.loading = false
-        return this.$store.getters['work'];
-      }
-    },
-    height() {
-      switch (this.$vuetify.breakpoint.name) {
-        case 'xs':
-          return 220
-        case 'sm':
-          return 400
-        case 'md':
-          return 500
-        case 'lg':
-          return 600
-        case 'xl':
-          return 800
-      }
+      return this.$store.getters.work
     },
   },
   methods: {
-    getMe() {
-      this.me = this.$store.getters['me']
-    },
     getRating() {
-      const rate_list = this.$store.getters['me'].rate_list.find(item => item.work_id === this.$route.params.id)
-      this.rating = rate_list?.rating
-    },  
-    async getWorkById() {
+      const rateList = this.me?.rate_list || []
+      const found = rateList.find(
+        (item) => item.work_id === this.$route.params.id,
+      )
+      this.rating = found?.rating ?? null
+    },
+    async loadWork() {
+      this.loading = true
       try {
-        // Fetch work by ID
-        const work = await this.$store.dispatch('getWorkById', this.$route.params.id);
-
-        // Update read list and readers
-        this.$store.dispatch('updateReadList', work.id);
-        this.$store.dispatch('updateReaders', work);
+        const work = await this.$store.dispatch(
+          'getWorkById',
+          this.$route.params.id,
+        )
+        await Promise.all([
+          this.$store.dispatch('updateReadList', work.id),
+          this.$store.dispatch('updateReaders', work),
+        ])
       } catch (error) {
-        console.error('Error fetching or updating work:', error);
-        // Handle error if necessary
+        console.error('Error fetching or updating work:', error)
+      } finally {
+        this.loading = false
       }
-      // this.$store.dispatch('getWorkById', this.$route.params.id)
-      // .then((data) => {
-      //   this.$store.dispatch('updateReadList', data.id)
-      //   this.$store.dispatch('updateReaders', data)
-      // })
     },
-    async sendRating() {
-      // console.log(this.rating);
-      this.$store.dispatch('updateRateList', this.rating);
-      this.$store.dispatch('updateRateBy', this.rating);
-      this.$store.dispatch('updateRecommender', this.rating).then((data) => {
-        console.log(data);
-      })
-    },
-    hashtag(id) {
-      return this.$store.state.hashtags.data.find((hashtag) => hashtag.id == id)
-    },
-    writer(id) {
-      return this.$store.state.users.data.find((user) => user.id == id)
+    sendRating() {
+      Promise.all([
+        this.$store.dispatch('updateRateList', this.rating),
+        this.$store.dispatch('updateRateBy', this.rating),
+      ])
+        .then(() => this.$store.dispatch('updateRecommender', this.rating))
+        .catch((error) => console.error('Error updating rating:', error))
     },
     openLink(link) {
-      window.open(link, "_blank");
-    }
+      window.open(link, '_blank')
+    },
   },
   components: { PopZoom, LoadingPage },
   mounted() {
-    this.getMe()
-    this.getWorkById();
     this.getRating()
-    if (!this.me) this.$router.push('/')
+    this.loadWork()
   },
 }
 </script>

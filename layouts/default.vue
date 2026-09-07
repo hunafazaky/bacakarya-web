@@ -8,20 +8,10 @@
       app
     >
       <h1 v-if="height > 500" class="text-center ma-5 white--text">
-        Reading App
+        Bacakarya
       </h1>
-      <h1 v-else class="text-center ma-5 white--text">R</h1>
-      <!-- <v-text-field
-        v-if="height > 500"
-        class="ma-2"
-        solo
-        dense
-        v-model="search"
-        append-icon="mdi-magnify"
-        label="Cari Sesuatu..."
-        single-line
-        hide-details
-      ></v-text-field> -->
+      <h1 v-else class="text-center ma-5 white--text">B</h1>
+      <!-- TODO: search bar was planned here but never wired to anything -->
       <v-list>
         <v-tooltip
           :disabled="height > 500"
@@ -42,34 +32,8 @@
           <span>{{ item.title }}</span>
         </v-tooltip>
         <v-divider />
-        <!-- <template v-if="height > 500">
-          <v-list-item
-            v-bind="attrs"
-            v-on="on"
-            :to="`/user/${me?.username}`"
-            router
-            exact
-          >
-            <v-list-item-action>
-              <v-avatar color="white" size="24">
-                <v-img :src="me.cover"></v-img>
-              </v-avatar>
-            </v-list-item-action>
-            <v-list-item-content>
-              <v-list-item-title
-                v-text="me?.username"
-              ></v-list-item-title>
-            </v-list-item-content>
-          </v-list-item>
-          <v-list-item v-bind="attrs" v-on="on" to="/setting" router exact>
-            <v-list-item-action>
-              <v-icon>mdi-cog</v-icon>
-            </v-list-item-action>
-            <v-list-item-content>
-              <v-list-item-title>Pengaturan</v-list-item-title>
-            </v-list-item-content>
-          </v-list-item>
-        </template> -->
+        <!-- TODO: a "current user" link + settings shortcut was planned
+             here but never finished/wired up -->
       </v-list>
     </v-navigation-drawer>
     <v-main class="mb-12">
@@ -100,11 +64,13 @@
 </template>
 
 <script>
+import responsiveHeight from '~/mixins/responsiveHeight'
+
 export default {
   name: 'DefaultLayout',
+  mixins: [responsiveHeight],
   data() {
     return {
-      search: '',
       items: [
         {
           icon: 'mdi-home',
@@ -127,43 +93,8 @@ export default {
           to: '/write',
         },
       ],
-      miniVariant: false,
-      right: true,
-      rightDrawer: false,
-      title: 'Reading App',
+      title: 'Bacakarya',
     }
-  },
-  computed: {
-    height() {
-      switch (this.$vuetify.breakpoint.name) {
-        case 'xs':
-          return 220
-        case 'sm':
-          return 400
-        case 'md':
-          return 500
-        case 'lg':
-          return 600
-        case 'xl':
-          return 800
-      }
-    },
-    me() {
-      if (this.$store.getters['me']) {
-        return this.$store.getters['me']
-      } else {
-        this.$router.push('/');
-        return []; 
-      }
-    },
-  },
-  methods: {
-    // getMe() {
-    //   this.me = this.$store.state.users.me
-    // },
-  },
-  mounted() {
-    // this.getMe()
   },
 }
 </script>

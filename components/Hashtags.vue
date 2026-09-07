@@ -21,7 +21,6 @@
         small
         @click="toggle"
         v-text="hashtag.name"
-        
       ></v-btn>
     </v-slide-item>
   </v-slide-group>
@@ -32,7 +31,7 @@ export default {
   name: 'Hashtags',
   props: [],
   data: () => ({
-    hashtagActived: null
+    hashtagActived: null,
   }),
   computed: {
     hashtags() {
@@ -41,16 +40,16 @@ export default {
   },
   methods: {
     sendHashtag(data) {
-      this.$emit('hashtag-actived', data);
-    }
+      this.$emit('hashtag-actived', data)
+    },
   },
   watch: {
     hashtagActived(newValue, oldValue) {
       // Di sini Anda dapat menjalankan metode atau tindakan yang Anda inginkan
       // console.log('Nilai berubah dari', oldValue, 'ke', newValue);
       // console.log();
-      this.sendHashtag(newValue);
-    }
+      this.sendHashtag(newValue)
+    },
   },
 }
 </script>

@@ -1,11 +1,13 @@
 <template>
-  <v-sheet height="100%" width="100%"
+  <v-sheet
+    height="100%"
+    width="100%"
     class="absolute"
     v-if="loading"
     color="rgba(255, 255, 255, 0.5)"
   >
     <v-progress-circular
-    class="absolute"
+      class="absolute"
       :size="70"
       :width="7"
       color="info"

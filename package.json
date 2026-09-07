@@ -1,14 +1,14 @@
 {
-  "name": "app-reading",
+  "name": "bacakarya-web",
   "version": "1.0.0",
   "private": true,
   "author": "hunafazaky",
   "license": "MIT",
   "scripts": {
-    "dev": "nuxt",
-    "build": "nuxt build",
-    "start": "nuxt start",
-    "generate": "nuxt generate",
+    "dev": "cross-env NODE_OPTIONS=--openssl-legacy-provider nuxt",
+    "build": "cross-env NODE_OPTIONS=--openssl-legacy-provider nuxt build",
+    "start": "cross-env NODE_OPTIONS=--openssl-legacy-provider nuxt start",
+    "generate": "cross-env NODE_OPTIONS=--openssl-legacy-provider nuxt generate",
     "lint:prettier": "prettier --check .",
     "lint": "npm run lint:prettier",
     "lintfix": "prettier --write --list-different ."
@@ -42,6 +42,7 @@
   "devDependencies": {
     "@mdi/font": "^6.6.96",
     "@nuxtjs/vuetify": "^1.12.3",
+    "cross-env": "^10.1.0",
     "eslint": "^8.0.1",
     "eslint-config-prettier": "^8.3.0",
     "eslint-config-standard": "^17.1.0",
@@ -50,5 +51,6 @@
     "eslint-plugin-promise": "^6.0.0",
     "eslint-plugin-vue": "^9.19.2",
     "prettier": "^2.5.1"
-  }
+  },
+  "packageManager": "yarn@4.18.0"
 }

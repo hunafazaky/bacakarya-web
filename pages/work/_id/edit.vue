@@ -17,10 +17,10 @@
               >
                 <v-img
                   style="inset: 0; position: absolute"
-                  v-if="work.content.img_cover"
+                  v-if="work.cover"
                   height="100%"
                   cover
-                  :src="work.content.img_cover"
+                  :src="work.cover"
                 ></v-img>
                 <v-icon v-else style="inset: 0; position: absolute" x-large>
                   mdi-plus-box
@@ -29,32 +29,6 @@
               <p class="caption text--secondary text-center">Preview</p>
             </v-col>
             <v-col cols="8" md="9">
-              <v-radio-group class="my-0" v-model="work.keyword.type" mandatory>
-                <template v-slot:label>
-                  <div>Pilih jenis Karya Tulis</div>
-                </template>
-                <v-radio
-                  value="Fiksi"
-                  off-icon="mdi-pound-box"
-                  on-icon="mdi-pound-box"
-                  color="purple"
-                >
-                  <template v-slot:label>
-                    <div>Fiksi</div>
-                  </template>
-                </v-radio>
-                <v-radio
-                  value="Non-Fiksi"
-                  off-icon="mdi-pound-box"
-                  on-icon="mdi-pound-box"
-                  color="error"
-                >
-                  <template v-slot:label>
-                    <div>Non-Fiksi</div>
-                  </template>
-                </v-radio>
-              </v-radio-group>
-              <v-divider></v-divider>
               <v-text-field
                 outlined
                 dense
@@ -62,7 +36,7 @@
                 hint="Pilih judul yang sesuai dan menarik pembaca"
                 persistent-hint
                 required
-                v-model="work.content.title"
+                v-model="work.title"
               ></v-text-field>
               <v-autocomplete
                 outlined
@@ -77,7 +51,7 @@
                 persistent-hint
                 :counter="5"
                 :items="hashtags"
-                v-model="work.keyword.hashtags"
+                v-model="work.category"
               ></v-autocomplete>
               <v-file-input
                 outlined
@@ -99,16 +73,17 @@
             <v-col cols="12">
               <div>Tulis karyamu di kotak ini</div>
               <client-only>
-                <tiptap-editor v-model="work.content.text" />
+                <tiptap-editor v-model="work.text" />
               </client-only>
             </v-col>
           </v-row>
         </v-card-text>
         <v-card-actions>
           <v-btn
+            :loading="loading"
             class="ma-2 px-4"
             color="success"
-            :disabled="!work.content.title || !work.content.text"
+            :disabled="!work.title || !work.text"
             @click="putWork"
           >
             Update
@@ -123,40 +98,50 @@
       >
         Data Berhasil Dikirim
       </v-alert>
+      <v-alert
+        class="mb-0"
+        type="error"
+        transition="slide-y-transition"
+        :value="!!errorMessage"
+      >
+        {{ errorMessage }}
+      </v-alert>
     </v-col>
   </v-row>
 </template>
 
 <script>
 import TiptapEditor from '~/components/TiptapEditor.vue'
+import currentUser from '~/mixins/currentUser'
 
 export default {
+  name: 'Edit',
+  middleware: 'auth',
+  mixins: [currentUser],
+  // NOTE: this used to fetch the work into a { content: {...}, keyword: {...} }
+  // shape that didn't match what write.vue / the store / WorkCard use
+  // everywhere else (flat title/text/cover/category). Normalized to match.
   async asyncData({ params, $axios }) {
     const work = await $axios.$get(`/works/${params.id}`)
-    return { work }
+    return {
+      work: {
+        id: work.id || work._id,
+        title: work.title,
+        text: work.text,
+        cover: work.cover,
+        category: work.category || [],
+        attachment: work.attachment || {},
+        writer: work.writer,
+      },
+    }
   },
-  name: 'Edit',
   data: () => ({
-    me: {},
     file: null,
+    loading: false,
     success: false,
-    // work: {},
+    errorMessage: '',
   }),
   computed: {
-    height() {
-      switch (this.$vuetify.breakpoint.name) {
-        case 'xs':
-          return 220
-        case 'sm':
-          return 400
-        case 'md':
-          return 500
-        case 'lg':
-          return 600
-        case 'xl':
-          return 800
-      }
-    },
     hashtags() {
       const hashtags = []
       this.$store.state.hashtags.data.forEach((element) => {
@@ -166,27 +151,40 @@ export default {
     },
   },
   methods: {
-    getMe() {
-      this.me = this.$store.state.users.me
-    },
     putWork() {
-      this.$axios.put(`/works/${this.work.id}`, this.work).then(() => {
-        this.success = true
-        setTimeout(() => {
-          this.$router.push('/home')
-        }, 2000)
-      })
+      this.loading = true
+      this.errorMessage = ''
+      this.$store
+        .dispatch('updateWork', this.work)
+        .then(() => {
+          this.success = true
+          setTimeout(() => {
+            this.$router.push('/home')
+          }, 1000)
+        })
+        .catch((error) => {
+          console.error('Error updating work:', error)
+          this.errorMessage =
+            'Gagal memperbarui karya tulis. Silakan coba lagi.'
+        })
+        .finally(() => {
+          this.loading = false
+        })
     },
     fileToImage() {
       if (this.file) {
-        this.work.content.img_cover = URL.createObjectURL(this.file)
+        if (this.work.cover && this.work.cover.startsWith('blob:')) {
+          URL.revokeObjectURL(this.work.cover)
+        }
+        this.work.cover = URL.createObjectURL(this.file)
       }
     },
   },
   components: { TiptapEditor },
-  mounted() {
-    this.getMe()
-    if (!this.me) this.$router.push('/')
+  beforeDestroy() {
+    if (this.work.cover && this.work.cover.startsWith('blob:')) {
+      URL.revokeObjectURL(this.work.cover)
+    }
   },
 }
 </script>

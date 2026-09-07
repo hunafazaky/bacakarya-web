@@ -1,15 +1,10 @@
 <template>
-  <v-row justify="center" align="center">
+  <v-row justify="center" align="center" v-if="profile">
     <PopZoom
       maxWidth="500px"
-      :image="me.photo"
+      :image="profile.photo"
       :showPopZoom="showPopZoom"
       @hidePopZoom="showPopZoom = false"
-    />
-    <PopZoom
-      :image="me.photo"
-      :showPopConfirm="showPopConfirm"
-      @hidePopConfirm="showPopConfirm = false"
     />
     <v-col cols="4">
       <v-sheet
@@ -24,7 +19,7 @@
           style="inset: 0; position: absolute"
           @click="showPopZoom = true"
         >
-          <v-img :src="me.photo"></v-img>
+          <v-img :src="profile.photo"></v-img>
         </v-avatar>
       </v-sheet>
     </v-col>
@@ -32,62 +27,45 @@
       <v-card rounded="lg" outlined>
         <v-card-text>
           <div class="d-flex">
-            <p class="my-1 font-weight-black overline">
-              Pen Name / Username
-            </p>
+            <p class="my-1 font-weight-black overline">Pen Name / Username</p>
             <v-spacer></v-spacer>
-            <p
-              class="my-1 font-weight-black overline"
-            >{{ me.pen_name }} / {{ me.username }}</p>
+            <p class="my-1 font-weight-black overline">
+              {{ profile.pen_name }} / {{ profile.username }}
+            </p>
           </div>
         </v-card-text>
         <v-divider></v-divider>
         <v-card-text>
           <div class="d-flex">
-            <p class="my-1 font-weight-light">
-              Jumlah karya yang ditulis
-            </p>
+            <p class="my-1 font-weight-light">Jumlah karya yang ditulis</p>
             <v-spacer></v-spacer>
-            <p
-              class="my-1 font-weight-light"
-              v-text="me.work_list.length"
-            ></p>
+            <p class="my-1 font-weight-light">
+              {{ profile.work_list?.length || 0 }}
+            </p>
           </div>
           <div class="d-flex">
-            <p class="my-1 font-weight-light">
-              Jumlah karya yang dibaca
-            </p>
+            <p class="my-1 font-weight-light">Jumlah karya yang dibaca</p>
             <v-spacer></v-spacer>
-            <p
-              class="my-1 font-weight-light"
-              v-text="me.read_list.length"
-            ></p>
+            <p class="my-1 font-weight-light">
+              {{ profile.read_list?.length || 0 }}
+            </p>
           </div>
           <div class="d-flex">
-            <p class="my-1 font-weight-light">
-              Jumlah karya yang disimpan
-            </p>
+            <p class="my-1 font-weight-light">Jumlah karya yang disimpan</p>
             <v-spacer></v-spacer>
-            <p
-              class="my-1 font-weight-light"
-              v-text="me.like_list.length"
-            ></p>
+            <p class="my-1 font-weight-light">
+              {{ profile.like_list?.length || 0 }}
+            </p>
           </div>
           <div class="d-flex">
             <p class="my-1 font-weight-light">
               Jumlah karya yang diberi rating
             </p>
             <v-spacer></v-spacer>
-            <p
-              class="my-1 font-weight-light"
-              v-text="me.rate_list.length"
-            ></p>
+            <p class="my-1 font-weight-light">
+              {{ profile.rate_list?.length || 0 }}
+            </p>
           </div>
-          <!-- <template v-for="work in me.read_list">
-            <div :key="work._id">
-              {{ work.category }}
-            </div>
-          </template> -->
         </v-card-text>
       </v-card>
     </v-col>
@@ -96,12 +74,12 @@
         <v-card-title class="ma-2">Karya Tulis Saya</v-card-title>
         <v-card-text>
           <v-row
+            v-if="profile.work_list && profile.work_list.length > 0"
             justify="start"
             class="px-4 py-1"
-            v-if="me.work_list.length > 0"
           >
             <v-col
-              v-for="work in me.work_list"
+              v-for="work in profile.work_list"
               :key="work._id"
               class="px-1 py-0"
               cols="4"
@@ -109,23 +87,16 @@
               md="3"
               xl="2"
             >
-              <!-- <WorkCard
-                :work="getWorkById(work._id)"
-                :wordLimit="{ title: 100, text: 0 }"
-                :miniVariant="true"
-              /> -->
               <WorkCard
-                  :work="work"
-                  :wordLimit="{ title: 100, text: 0 }"
-                  :miniVariant="false"
-                  :mutation="false"
-                  @remove-work="deleteWork"
-                />
+                :work="work"
+                :wordLimit="{ title: 100, text: 0 }"
+                :miniVariant="false"
+                :mutation="isOwnProfile"
+                @remove-work="deleteWork"
+              />
             </v-col>
           </v-row>
-          <template v-else>
-            <p class="overline text-center text-secondary ma-4">Kosong</p>
-          </template>
+          <p v-else class="overline text-center text-secondary ma-4">Kosong</p>
         </v-card-text>
       </v-card>
     </v-col>
@@ -133,62 +104,51 @@
 </template>
 
 <script>
-import WorkCard from '../../../components/WorkCard.vue'
-import PopZoom from '../../../components/PopZoom.vue'
-import PopConfirm from '../../../components/PopConfirm.vue'
-import { mapMutations } from 'vuex'
+import WorkCard from '~/components/WorkCard.vue'
+import PopZoom from '~/components/PopZoom.vue'
+import currentUser from '~/mixins/currentUser'
 
 export default {
-  name: 'User',
+  name: 'UserProfile',
+  middleware: 'auth',
+  mixins: [currentUser],
   data: () => ({
     showPopZoom: false,
-    showPopConfirm: false,
-    // user: {},
-    work: {},
+    profile: null,
   }),
   computed: {
-    me() {
-      if (this.$store.getters['me']) {
-        // this.loading.user = false
-        return this.$store.getters['me']
-      } else {
-        this.$router.push('/');
-        return []; 
-      }
+    isOwnProfile() {
+      return this.me?.username === this.$route.params.username
     },
   },
   methods: {
-    // getMe() {
-    //   this.me = this.$store.state.users.me
-    // },
-    getUserByUsername() {
-      this.$axios
-        .get(`/users?username=${this.$route.params.username}`)
-        .then((user) => {
-          this.user = me.data[0]
+    async fetchProfile() {
+      // Viewing your own profile doesn't need a network round-trip - the
+      // full user object is already in the store.
+      if (this.isOwnProfile) {
+        this.profile = this.me
+        return
+      }
+      try {
+        const res = await this.$axios.get('/users', {
+          params: { username: this.$route.params.username },
         })
+        this.profile = res.data[0] || null
+      } catch (error) {
+        console.error('Error fetching user:', error)
+      }
     },
-    getWorkById(work_id) {
-      this.$axios.get(`/works/${work_id}`).then((work) => {
-        this.work = work.data
+    deleteWork(id) {
+      if (!window.confirm('Apakah anda ingin menghapus karya tulis ini??'))
+        return
+      this.$store.dispatch('deleteWork', id).then(() => {
+        this.fetchProfile()
       })
-      return this.work
     },
-    addTodo(e) {
-      console.log(e.target.value)
-      console.log(this.todos)
-      this.$store.commit('todos/add', e.target.value)
-      e.target.value = ''
-    },
-    ...mapMutations({
-      toggle: 'todos/toggle',
-    }),
   },
+  components: { WorkCard, PopZoom },
   mounted() {
-    this.getUserByUsername()
-    // this.getMe()
-    // if (!this.me.account) this.$router.push('/')
+    this.fetchProfile()
   },
-  component: { PopZoom, PopConfirm },
 }
 </script>
