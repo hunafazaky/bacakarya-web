@@ -51,7 +51,7 @@ export default {
       const likeList = this.me?.like_list || []
       try {
         this.works = await Promise.all(
-          likeList.map((item) => this.$store.dispatch('getWorkById', item._id)),
+          likeList.map((item) => this.$store.dispatch('getWorkById', item._id))
         )
       } catch (error) {
         console.error('Gagal memuat rak buku:', error)

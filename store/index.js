@@ -12,44 +12,44 @@ export const state = () => ({
   // state for users
   usersData: null,
   userData: null,
-  newReadList: null
+  newReadList: null,
 })
 
 export const mutations = {
   // mutation for recommender
-  setForYou (state, data) {
+  setForYou(state, data) {
     state.forYouData = data
   },
 
   // mutation for Works
-  setWorks (state, data) {
+  setWorks(state, data) {
     state.worksData = data
   },
-  setWork (state, data) {
+  setWork(state, data) {
     state.workData = data
   },
-  updateReaders (state, data) {
+  updateReaders(state, data) {
     const newData = data.readers.filter(
       (item) => item._id !== state.userData.id
     )
     newData.unshift(state.userData.id)
     state.workReaders = newData
   },
-  updateLikeBy (state, data) {
+  updateLikeBy(state, data) {
     const newData = data.like_by.filter(
       (item) => item._id !== state.userData.id
     )
     newData.unshift(state.userData.id)
     state.workLikeBy = newData
   },
-  updateRateBy (state, rating) {
+  updateRateBy(state, rating) {
     const newData = state.workData.rate_by.filter(
       (item) => item.user_id !== state.userData.id
     )
     newData.unshift({ user_id: state.userData.id, rating })
     state.workData.rate_by = newData
   },
-  removeLikeBy (state, data) {
+  removeLikeBy(state, data) {
     const newData = data.like_by.filter(
       (item) => item._id !== state.userData.id
     )
@@ -57,38 +57,38 @@ export const mutations = {
   },
 
   // mutation for Users
-  setUsers (state, data) {
+  setUsers(state, data) {
     state.usersData = data
   },
-  setUser (state, data) {
+  setUser(state, data) {
     state.userData = data
   },
-  updateReadList (state, data) {
+  updateReadList(state, data) {
     const newData = state.userData.read_list.filter((item) => item._id !== data)
     newData.unshift(data)
     state.newReadList = newData
   },
-  updateLikeList (state, data) {
+  updateLikeList(state, data) {
     const newData = state.userData.like_list.filter((item) => item._id !== data)
     newData.unshift(data)
     state.userData.like_list = newData
   },
-  updateRateList (state, rating) {
+  updateRateList(state, rating) {
     const newData = state.userData.rate_list.filter(
       (item) => item.work_id !== state.workData.id
     )
     newData.unshift({ work_id: state.workData.id, rating })
     state.userData.rate_list = newData
   },
-  removeLikeList (state, data) {
+  removeLikeList(state, data) {
     const newData = state.userData.like_list.filter((item) => item._id !== data)
     state.userData.like_list = newData
-  }
+  },
 }
 
 export const actions = {
   // action for recommender
-  getForYou ({ state, commit }) {
+  getForYou({ state, commit }) {
     return new Promise((resolve, reject) => {
       this.$axios
         .get('/user_recommenders/' + state.userData.id)
@@ -102,14 +102,14 @@ export const actions = {
         })
     })
   },
-  updateRecommender ({ state, commit }, rating) {
+  updateRecommender({ state, commit }, rating) {
     return new Promise((resolve, reject) => {
       // commit('updateRecommender', rating)
       this.$axios
-        .put('/user_recommenders', {
+        .put(`/user_recommenders`, {
           work_id: state.workData.id,
           user_id: state.userData.id,
-          rating
+          rating,
         })
         .then((response) => {
           // commit('setUser', response.data)
@@ -143,7 +143,7 @@ export const actions = {
   //   })
   // },
 
-  getWorks ({ commit }, { page = 1, limit = 12, category = '' } = {}) {
+  getWorks({ commit }, { page = 1, limit = 12, category = '' } = {}) {
     return new Promise((resolve, reject) => {
       this.$axios
         .get('/works', {
@@ -151,8 +151,8 @@ export const actions = {
             sortBy: 'newest',
             page,
             limit,
-            category // tambahkan ini
-          }
+            category, // tambahkan ini
+          },
         })
         .then((response) => {
           commit('setWorks', response.data.works) // opsional
@@ -166,7 +166,7 @@ export const actions = {
   },
   //
   // // //
-  getWorkById ({ commit }, id) {
+  getWorkById({ commit }, id) {
     return new Promise((resolve, reject) => {
       this.$axios
         .get('/works/' + id)
@@ -180,7 +180,7 @@ export const actions = {
         })
     })
   },
-  updateReaders ({ state, commit }, work) {
+  updateReaders({ state, commit }, work) {
     return new Promise((resolve, reject) => {
       commit('updateReaders', work)
       this.$axios
@@ -194,7 +194,7 @@ export const actions = {
         })
     })
   },
-  updateLikeBy ({ state, commit }, work) {
+  updateLikeBy({ state, commit }, work) {
     return new Promise((resolve, reject) => {
       commit('updateLikeBy', work)
       this.$axios
@@ -208,7 +208,7 @@ export const actions = {
         })
     })
   },
-  updateRateBy ({ state, commit }, rating) {
+  updateRateBy({ state, commit }, rating) {
     return new Promise((resolve, reject) => {
       commit('updateRateBy', rating)
       this.$axios
@@ -222,7 +222,7 @@ export const actions = {
         })
     })
   },
-  removeLikeBy ({ state, commit }, work) {
+  removeLikeBy({ state, commit }, work) {
     return new Promise((resolve, reject) => {
       commit('removeLikeBy', work)
       this.$axios
@@ -236,7 +236,7 @@ export const actions = {
         })
     })
   },
-  postWork ({ commit }, data) {
+  postWork({ commit }, data) {
     return new Promise((resolve, reject) => {
       this.$axios
         .post('/works', data)
@@ -250,7 +250,7 @@ export const actions = {
         })
     })
   },
-  updateWork ({ commit }, work) {
+  updateWork({ commit }, work) {
     return new Promise((resolve, reject) => {
       this.$axios
         .put(`/works/${work.id}`, work)
@@ -263,7 +263,7 @@ export const actions = {
         })
     })
   },
-  deleteWork ({ commit }, id) {
+  deleteWork({ commit }, id) {
     return new Promise((resolve, reject) => {
       this.$axios
         .delete('/works/' + id)
@@ -279,7 +279,7 @@ export const actions = {
   },
 
   // action for users
-  getUsers ({ commit }) {
+  getUsers({ commit }) {
     return new Promise((resolve, reject) => {
       this.$axios
         .get('/users')
@@ -293,7 +293,7 @@ export const actions = {
         })
     })
   },
-  getUserById ({ commit }, id) {
+  getUserById({ commit }, id) {
     return new Promise((resolve, reject) => {
       this.$axios
         .get('/users/' + id)
@@ -307,7 +307,7 @@ export const actions = {
         })
     })
   },
-  getUser ({ commit }, id) {
+  getUser({ commit }, id) {
     return new Promise((resolve, reject) => {
       this.$axios
         .get('/users/' + id)
@@ -320,7 +320,7 @@ export const actions = {
         })
     })
   },
-  updateReadList ({ state, commit }, workId) {
+  updateReadList({ state, commit }, workId) {
     return new Promise((resolve, reject) => {
       commit('updateReadList', workId)
       this.$axios
@@ -335,12 +335,12 @@ export const actions = {
         })
     })
   },
-  updateLikeList ({ state, commit }, workId) {
+  updateLikeList({ state, commit }, workId) {
     return new Promise((resolve, reject) => {
       commit('updateLikeList', workId)
       this.$axios
         .put(`/users/${state.userData.id}`, {
-          like_list: state.userData.like_list
+          like_list: state.userData.like_list,
         })
         .then((response) => {
           commit('setUser', response.data)
@@ -352,12 +352,12 @@ export const actions = {
         })
     })
   },
-  updateRateList ({ state, commit }, rating) {
+  updateRateList({ state, commit }, rating) {
     return new Promise((resolve, reject) => {
       commit('updateRateList', rating)
       this.$axios
         .put(`/users/${state.userData.id}`, {
-          rate_list: state.userData.rate_list
+          rate_list: state.userData.rate_list,
         })
         .then((response) => {
           commit('setUser', response.data)
@@ -369,12 +369,12 @@ export const actions = {
         })
     })
   },
-  removeLikeList ({ state, commit }, workId) {
+  removeLikeList({ state, commit }, workId) {
     return new Promise((resolve, reject) => {
       commit('removeLikeList', workId)
       this.$axios
         .put(`/users/${state.userData.id}`, {
-          like_list: state.userData.like_list
+          like_list: state.userData.like_list,
         })
         .then((response) => {
           commit('setUser', response.data)
@@ -386,13 +386,13 @@ export const actions = {
         })
     })
   },
-  regis ({ commit }, data) {
+  regis({ commit }, data) {
     return new Promise((resolve, reject) => {
       this.$axios
         .post('/users', {
           username: data.username,
           pen_name: data.username,
-          password: data.password
+          password: data.password,
         })
         .then((response) => {
           console.log(response.data)
@@ -404,12 +404,12 @@ export const actions = {
         })
     })
   },
-  login ({ commit }, data) {
+  login({ commit }, data) {
     return new Promise((resolve, reject) => {
       this.$axios
         .post('/users/login', {
           username: data.username,
-          password: data.password
+          password: data.password,
         })
         .then((response) => {
           commit('setUser', response.data)
@@ -420,23 +420,23 @@ export const actions = {
           reject(error)
         })
     })
-  }
+  },
 }
 
 export const getters = {
-  works (state) {
+  works(state) {
     return state.worksData
   },
-  foryou (state) {
+  foryou(state) {
     return state.forYouData
   },
-  work (state) {
+  work(state) {
     return state.workData
   },
-  users (state) {
+  users(state) {
     return state.usersData
   },
-  me (state) {
+  me(state) {
     return state.userData
-  }
+  },
 }

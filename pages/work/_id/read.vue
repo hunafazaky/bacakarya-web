@@ -130,7 +130,7 @@ export default {
     getRating() {
       const rateList = this.me?.rate_list || []
       const found = rateList.find(
-        (item) => item.work_id === this.$route.params.id,
+        (item) => item.work_id === this.$route.params.id
       )
       this.rating = found?.rating ?? null
     },
@@ -139,7 +139,7 @@ export default {
       try {
         const work = await this.$store.dispatch(
           'getWorkById',
-          this.$route.params.id,
+          this.$route.params.id
         )
         await Promise.all([
           this.$store.dispatch('updateReadList', work.id),

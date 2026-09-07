@@ -243,7 +243,7 @@ export default {
         // Upload attachment
         if (this.fileOfAttachment) {
           const attachmentLink = await this.uploadFileToStorage(
-            this.fileOfAttachment,
+            this.fileOfAttachment
           )
           this.work.attachment = {
             title: this.fileOfAttachment.name,

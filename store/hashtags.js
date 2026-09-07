@@ -6,6 +6,6 @@ export const state = () => ({
     { id: 1, name: 'Kesehatan' },
     { id: 2, name: 'Olahraga' },
     { id: 3, name: 'Travel' },
-    { id: 4, name: 'Otomotif' }
-  ]
+    { id: 4, name: 'Otomotif' },
+  ],
 })
