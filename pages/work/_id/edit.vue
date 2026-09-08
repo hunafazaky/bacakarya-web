@@ -122,10 +122,11 @@ export default {
   // shape that didn't match what write.vue / the store / WorkCard use
   // everywhere else (flat title/text/cover/category). Normalized to match.
   async asyncData({ params, $axios }) {
-    const work = await $axios.$get(`/works/${params.id}`)
+    const res = await $axios.$get(`/works/${params.id}`)
+    const work = res.data
     return {
       work: {
-        id: work.id || work._id,
+        id: work.id,
         title: work.title,
         text: work.text,
         cover: work.cover,

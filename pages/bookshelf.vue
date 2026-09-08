@@ -1,6 +1,15 @@
 <template>
   <div>
-    <v-row :justify="works.length > 0 ? 'start' : 'center'" class="px-4 py-2">
+    <v-row v-if="likesDisabled" justify="center" class="px-4 py-2">
+      <p class="overline text-center text-secondary ma-4">
+        Fitur simpan karya belum tersedia
+      </p>
+    </v-row>
+    <v-row
+      v-else
+      :justify="works.length > 0 ? 'start' : 'center'"
+      class="px-4 py-2"
+    >
       <LoadingComponent v-if="loading" :loading="true" />
       <template v-else-if="works.length > 0">
         <v-col
@@ -13,7 +22,7 @@
           xl="2"
         >
           <WorkCard
-            :work="{ ...work, id: work._id }"
+            :work="work"
             :wordLimit="{ title: 100, text: 0 }"
             :miniVariant="false"
             :mutation="false"
@@ -33,15 +42,16 @@ import WorkCard from '../components/WorkCard.vue'
 import LoadingComponent from '../components/LoadingComponent.vue'
 import currentUser from '../mixins/currentUser'
 
+// TODO: this whole page is built around `me.like_list`, which is populated
+// by the "like a work" feature - currently disabled because the API has no
+// endpoint for it yet (see store/index.js). Once that exists, flip
+// `likesDisabled` off and this should work as-is.
 export default {
   name: 'Bookshelf',
   middleware: 'auth',
   mixins: [currentUser],
-  components: {
-    WorkCard,
-    LoadingComponent,
-  },
   data: () => ({
+    likesDisabled: true,
     loading: true,
     works: [],
   }),
@@ -51,7 +61,7 @@ export default {
       const likeList = this.me?.like_list || []
       try {
         this.works = await Promise.all(
-          likeList.map((item) => this.$store.dispatch('getWorkById', item._id))
+          likeList.map((id) => this.$store.dispatch('getWorkById', id))
         )
       } catch (error) {
         console.error('Gagal memuat rak buku:', error)
@@ -68,7 +78,7 @@ export default {
     },
   },
   mounted() {
-    this.getWorks()
+    if (!this.likesDisabled) this.getWorks()
   },
 }
 </script>

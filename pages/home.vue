@@ -36,7 +36,7 @@
               cols="4"
             >
               <WorkCard
-                :work="{ ...work, id: work._id }"
+                :work="work"
                 :wordLimit="{ title: 100, text: 0 }"
                 :miniVariant="false"
                 :mutation="false"
@@ -79,8 +79,8 @@
             <template v-if="me.work_list && me.work_list.length > 0">
               <nuxt-link
                 v-for="work in me.work_list.slice(0, 5)"
-                :key="work._id"
-                :to="`/work/${work._id}/read`"
+                :key="work.id"
+                :to="`/work/${work.id}/read`"
                 class="text-decoration-none text--secondary"
               >
                 <p v-text="work.title"></p>
@@ -96,8 +96,8 @@
             <template v-if="me.read_list && me.read_list.length > 0">
               <nuxt-link
                 v-for="read in me.read_list.slice(0, 5)"
-                :key="read._id"
-                :to="`/work/${read._id}/read`"
+                :key="read.id"
+                :to="`/work/${read.id}/read`"
                 class="text-decoration-none text--secondary"
               >
                 <p v-text="read.title"></p>

@@ -19,7 +19,7 @@
               cols="3"
             >
               <WorkCard
-                :work="{ ...work, id: work._id }"
+                :work="work"
                 :wordLimit="{ title: 100, text: 0 }"
                 :miniVariant="false"
                 :mutation="false"

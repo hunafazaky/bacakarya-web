@@ -137,26 +137,23 @@ export default {
     async loadWork() {
       this.loading = true
       try {
-        const work = await this.$store.dispatch(
-          'getWorkById',
-          this.$route.params.id
-        )
-        await Promise.all([
-          this.$store.dispatch('updateReadList', work.id),
-          this.$store.dispatch('updateReaders', work),
-        ])
+        await this.$store.dispatch('getWorkById', this.$route.params.id)
+        // TODO: marking a work as "read" (readers/read_list) has no backing
+        // endpoint yet - see store/index.js. Re-enable when one exists:
+        // await this.$store.dispatch('updateReadList', work.id)
+        // await this.$store.dispatch('updateReaders', work)
       } catch (error) {
-        console.error('Error fetching or updating work:', error)
+        console.error('Error fetching work:', error)
       } finally {
         this.loading = false
       }
     },
     sendRating() {
-      Promise.all([
-        this.$store.dispatch('updateRateList', this.rating),
-        this.$store.dispatch('updateRateBy', this.rating),
-      ])
-        .then(() => this.$store.dispatch('updateRecommender', this.rating))
+      // PUT /recommendations is the one real, documented way to submit a
+      // rating - it's expected to update the work/user's rating records
+      // server-side, so we don't PUT those directly ourselves.
+      this.$store
+        .dispatch('updateRecommender', this.rating)
         .catch((error) => console.error('Error updating rating:', error))
     },
     openLink(link) {

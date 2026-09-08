@@ -89,6 +89,8 @@
                 </v-btn>
               </v-col>
               <v-col cols="12">
+                <!-- TODO: liking a work has no backing endpoint yet
+                     (see store/index.js). Re-enable once one exists.
                 <v-btn
                   v-if="!liked"
                   x-small
@@ -108,6 +110,7 @@
                   <v-icon small left> mdi-text-box-minus </v-icon>
                   buang
                 </v-btn>
+                -->
                 <v-btn
                   x-small
                   color="success"
@@ -164,8 +167,10 @@ export default {
     },
   },
   data: () => ({
-    liked: false,
-    loading: false,
+    // liked/loading only matter for the (currently disabled) like feature -
+    // see the commented-out buttons above and store/index.js.
+    // liked: false,
+    // loading: false,
   }),
   computed: {
     me() {
@@ -183,39 +188,35 @@ export default {
     removeWork(id) {
       this.$emit('remove-work', id)
     },
-    likeCheck() {
-      const likeBy = this.work.like_by || []
-      this.liked = this.me
-        ? likeBy.some((item) => item._id === this.me.id)
-        : false
-    },
-    async likeWork(work) {
-      try {
-        this.loading = true
-        await this.$store.dispatch('updateLikeList', work.id)
-        await this.$store.dispatch('updateLikeBy', work)
-        this.liked = true
-      } catch (error) {
-        console.error('Error updating like:', error)
-      } finally {
-        this.loading = false
-      }
-    },
-    async dislikeWork(work) {
-      try {
-        this.loading = true
-        await this.$store.dispatch('removeLikeList', work.id)
-        await this.$store.dispatch('removeLikeBy', work)
-        this.liked = false
-      } catch (error) {
-        console.error('Error removing like:', error)
-      } finally {
-        this.loading = false
-      }
-    },
-  },
-  mounted() {
-    this.likeCheck()
+    // TODO: re-enable once liking a work has a backing endpoint.
+    // likeCheck() {
+    //   const likeBy = this.work.like_by || []
+    //   this.liked = this.me ? likeBy.includes(this.me.id) : false
+    // },
+    // async likeWork(work) {
+    //   try {
+    //     this.loading = true
+    //     await this.$store.dispatch('updateLikeList', work.id)
+    //     await this.$store.dispatch('updateLikeBy', work)
+    //     this.liked = true
+    //   } catch (error) {
+    //     console.error('Error updating like:', error)
+    //   } finally {
+    //     this.loading = false
+    //   }
+    // },
+    // async dislikeWork(work) {
+    //   try {
+    //     this.loading = true
+    //     await this.$store.dispatch('removeLikeList', work.id)
+    //     await this.$store.dispatch('removeLikeBy', work)
+    //     this.liked = false
+    //   } catch (error) {
+    //     console.error('Error removing like:', error)
+    //   } finally {
+    //     this.loading = false
+    //   }
+    // },
   },
 }
 </script>

@@ -80,7 +80,7 @@
           >
             <v-col
               v-for="work in profile.work_list"
-              :key="work._id"
+              :key="work.id"
               class="px-1 py-0"
               cols="4"
               sm="4"
@@ -133,7 +133,7 @@ export default {
         const res = await this.$axios.get('/users', {
           params: { username: this.$route.params.username },
         })
-        this.profile = res.data[0] || null
+        this.profile = res.data.data[0] || null
       } catch (error) {
         console.error('Error fetching user:', error)
       }
