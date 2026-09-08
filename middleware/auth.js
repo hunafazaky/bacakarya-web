@@ -8,6 +8,6 @@
 // `me` in the template. Middleware always runs, before the page mounts.
 export default function ({ store, redirect }) {
   if (!store.getters.me) {
-    return redirect('/')
+    return redirect('/');
   }
 }

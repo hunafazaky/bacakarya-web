@@ -14,13 +14,13 @@
       <!-- TODO: search bar was planned here but never wired to anything -->
       <v-list>
         <v-tooltip
-          :disabled="height > 500"
           v-for="(item, i) in items"
           :key="i"
+          :disabled="height > 500"
           right
         >
-          <template v-slot:activator="{ on, attrs }">
-            <v-list-item v-bind="attrs" v-on="on" :to="item.to" router exact>
+          <template #activator="{ on, attrs }">
+            <v-list-item v-bind="attrs" :to="item.to" router exact v-on="on">
               <v-list-item-action>
                 <v-icon>{{ item.icon }}</v-icon>
               </v-list-item-action>
@@ -64,7 +64,7 @@
 </template>
 
 <script>
-import responsiveHeight from '~/mixins/responsiveHeight'
+import responsiveHeight from '~/mixins/responsiveHeight';
 
 export default {
   name: 'DefaultLayout',
@@ -94,9 +94,9 @@ export default {
         },
       ],
       title: 'Bacakarya',
-    }
+    };
   },
-}
+};
 </script>
 
 <style lang="css">

@@ -1,9 +1,9 @@
 <template>
   <v-sheet
+    v-if="loading"
     height="100%"
     width="100%"
     class="absolute"
-    v-if="loading"
     color="rgba(255, 255, 255, 0.5)"
   >
     <v-progress-circular
@@ -29,9 +29,9 @@ export default {
   name: 'LoadingPage',
   props: ['loading'],
   data() {
-    return {}
+    return {};
   },
-}
+};
 </script>
 
 <style scoped>

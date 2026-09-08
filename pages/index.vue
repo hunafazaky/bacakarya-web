@@ -3,7 +3,7 @@
     <LoadingPage :loading="loading" />
     <h1 class="text-center ma-4">Reading App</h1>
     <v-row justify="center" align="center">
-      <v-col md="6" lg="5" v-if="height >= 500">
+      <v-col v-if="height >= 500" md="6" lg="5">
         <v-img src="/login-image.png" width="100%"></v-img>
       </v-col>
       <v-col cols="12" sm="8" md="4" lg="4">
@@ -11,15 +11,15 @@
           <v-card-title v-text="form_title"></v-card-title>
           <v-card-text>
             <v-text-field
-              dense
               v-model="user.username"
+              dense
               label="Username"
               type="text"
               required
             ></v-text-field>
             <v-text-field
-              dense
               v-model="user.password"
+              dense
               label="Password"
               type="password"
               required
@@ -71,19 +71,16 @@
   </div>
 </template>
 
-<style scoped>
-/* .card {
-  opacity: 90% !important;
-} */
-</style>
-
 <script>
-import LoadingPage from '../components/LoadingPage.vue'
-import responsiveHeight from '../mixins/responsiveHeight'
+import LoadingPage from '../components/LoadingPage.vue';
+import responsiveHeight from '../mixins/responsiveHeight';
 
 export default {
-  layout: 'login',
+  components: {
+    LoadingPage,
+  },
   mixins: [responsiveHeight],
+  layout: 'login',
   data: () => ({
     user: {
       username: null,
@@ -95,54 +92,57 @@ export default {
     message: '',
     loading: false,
   }),
-  components: {
-    LoadingPage,
-  },
   methods: {
     openLoginForm() {
-      this.form_title = 'Login'
+      this.form_title = 'Login';
     },
     openRegisForm() {
-      this.form_title = 'Registrasi'
+      this.form_title = 'Registrasi';
     },
     login() {
-      this.loading = true
-      this.loginAttempt = true
+      this.loading = true;
+      this.loginAttempt = true;
       this.$store
         .dispatch('login', this.user)
         .then((data) => {
           if (data.id) {
-            this.message = 'Login Berhasil!!'
-            this.$router.push('/home')
+            this.message = 'Login Berhasil!!';
+            this.$router.push('/home');
           } else {
-            this.message = 'Error: ' + data.message
-            this.loading = false
+            this.message = 'Error: ' + data.message;
+            this.loading = false;
           }
         })
         .catch((err) => {
-          this.message = 'Error: ' + (err.message || 'Gagal login')
-          this.loading = false
-        })
+          this.message = 'Error: ' + (err.message || 'Gagal login');
+          this.loading = false;
+        });
     },
     regis() {
-      this.regisAttempt = true
-      this.loading = true
+      this.regisAttempt = true;
+      this.loading = true;
       this.$store
         .dispatch('regis', this.user)
         .then((data) => {
           if (data.id) {
-            this.message = 'Registrasi Berhasil!!'
-            this.login()
+            this.message = 'Registrasi Berhasil!!';
+            this.login();
           } else {
-            this.message = 'Error: ' + data.message
-            this.loading = false
+            this.message = 'Error: ' + data.message;
+            this.loading = false;
           }
         })
         .catch((err) => {
-          this.message = 'Error: ' + (err.message || 'Gagal registrasi')
-          this.loading = false
-        })
+          this.message = 'Error: ' + (err.message || 'Gagal registrasi');
+          this.loading = false;
+        });
     },
   },
-}
+};
 </script>
+
+<style scoped>
+/* .card {
+  opacity: 90% !important;
+} */
+</style>

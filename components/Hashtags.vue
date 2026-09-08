@@ -35,12 +35,7 @@ export default {
   }),
   computed: {
     hashtags() {
-      return this.$store.state.hashtags.data
-    },
-  },
-  methods: {
-    sendHashtag(data) {
-      this.$emit('hashtag-actived', data)
+      return this.$store.state.hashtags.data;
     },
   },
   watch: {
@@ -48,10 +43,15 @@ export default {
       // Di sini Anda dapat menjalankan metode atau tindakan yang Anda inginkan
       // console.log('Nilai berubah dari', oldValue, 'ke', newValue);
       // console.log();
-      this.sendHashtag(newValue)
+      this.sendHashtag(newValue);
     },
   },
-}
+  methods: {
+    sendHashtag(data) {
+      this.$emit('hashtag-actived', data);
+    },
+  },
+};
 </script>
 
 <!-- v-if="i < 5"

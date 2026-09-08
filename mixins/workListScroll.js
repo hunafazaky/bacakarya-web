@@ -12,59 +12,60 @@ export default {
       limit: 12,
       total: 0,
       loadingWorks: true,
-    }
+    };
   },
   methods: {
     async fetchWorks() {
-      this.loadingWorks = true
+      this.loadingWorks = true;
       try {
         const res = await this.$store.dispatch('getWorks', {
           page: this.page,
           limit: this.limit,
           category: this.category || '',
-        })
+        });
         if (res && Array.isArray(res.works)) {
-          this.works.push(...res.works)
-          this.total = res.total || 0
+          this.works.push(...res.works);
+          this.total = res.total || 0;
         }
       } catch (error) {
-        console.error('Gagal memuat works:', error)
+        console.error('Gagal memuat works:', error);
       } finally {
-        this.loadingWorks = false
+        this.loadingWorks = false;
       }
     },
     async loadMore() {
-      if (this.works.length >= this.total) return
-      this.page += 1
-      await this.fetchWorks()
+      if (this.works.length >= this.total) return;
+      this.page += 1;
+      await this.fetchWorks();
     },
     handleScroll() {
-      const scrollBottom = window.innerHeight + window.scrollY
-      const fullHeight = document.documentElement.offsetHeight
-      const nearBottom = scrollBottom >= fullHeight - 100
+      const scrollBottom = window.innerHeight + window.scrollY;
+      const fullHeight = document.documentElement.offsetHeight;
+      const nearBottom = scrollBottom >= fullHeight - 100;
       if (nearBottom && !this.loadingWorks && this.works.length < this.total) {
-        this.loadMore()
+        this.loadMore();
       }
     },
     resetWorks() {
-      this.page = 1
-      this.works = []
-      this.fetchWorks()
+      this.page = 1;
+      this.works = [];
+      this.fetchWorks();
     },
     deleteWork(id) {
       if (!window.confirm('Apakah anda ingin menghapus karya tulis ini??'))
-        return
+        return;
       this.$store.dispatch('deleteWork', id).then(() => {
-        this.resetWorks()
-        if (typeof this.afterWorkDeleted === 'function') this.afterWorkDeleted()
-      })
+        this.resetWorks();
+        if (typeof this.afterWorkDeleted === 'function')
+          this.afterWorkDeleted();
+      });
     },
   },
   mounted() {
-    this.fetchWorks()
-    window.addEventListener('scroll', this.handleScroll)
+    this.fetchWorks();
+    window.addEventListener('scroll', this.handleScroll);
   },
   beforeDestroy() {
-    window.removeEventListener('scroll', this.handleScroll)
+    window.removeEventListener('scroll', this.handleScroll);
   },
-}
+};

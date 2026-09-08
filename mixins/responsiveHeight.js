@@ -13,10 +13,10 @@ export default {
         md: 500,
         lg: 600,
         xl: 800,
-      }
+      };
       // Default to the 'md' breakpoint's value if Vuetify ever reports an
       // unrecognised name, instead of silently returning undefined.
-      return heights[this.$vuetify.breakpoint.name] ?? heights.md
+      return heights[this.$vuetify.breakpoint.name] ?? heights.md;
     },
   },
-}
+};

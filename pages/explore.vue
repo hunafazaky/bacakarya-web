@@ -20,8 +20,8 @@
             >
               <WorkCard
                 :work="work"
-                :wordLimit="{ title: 100, text: 0 }"
-                :miniVariant="false"
+                :word-limit="{ title: 100, text: 0 }"
+                :mini-variant="false"
                 :mutation="false"
                 @remove-work="deleteWork"
               />
@@ -40,29 +40,29 @@
 </template>
 
 <script>
-import WorkCard from '../components/WorkCard.vue'
-import Hashtags from '../components/Hashtags.vue'
-import LoadingComponent from '../components/LoadingComponent.vue'
-import currentUser from '../mixins/currentUser'
-import workListScroll from '../mixins/workListScroll'
+import WorkCard from '../components/WorkCard.vue';
+import Hashtags from '../components/Hashtags.vue';
+import LoadingComponent from '../components/LoadingComponent.vue';
+import currentUser from '../mixins/currentUser';
+import workListScroll from '../mixins/workListScroll';
 
 export default {
   name: 'Explore',
-  middleware: 'auth',
-  mixins: [currentUser, workListScroll],
   components: {
     WorkCard,
     Hashtags,
     LoadingComponent,
   },
+  mixins: [currentUser, workListScroll],
+  middleware: 'auth',
   data: () => ({
     category: '',
   }),
   methods: {
     onHashtagChanged(category) {
-      this.category = category || ''
-      this.resetWorks()
+      this.category = category || '';
+      this.resetWorks();
     },
   },
-}
+};
 </script>

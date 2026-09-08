@@ -1,10 +1,10 @@
 <template>
-  <v-row justify="center" align="center" v-if="profile">
+  <v-row v-if="profile" justify="center" align="center">
     <PopZoom
-      maxWidth="500px"
+      max-width="500px"
       :image="profile.photo"
-      :showPopZoom="showPopZoom"
-      @hidePopZoom="showPopZoom = false"
+      :show-pop-zoom="showPopZoom"
+      @hide-pop-zoom="showPopZoom = false"
     />
     <v-col cols="4">
       <v-sheet
@@ -89,8 +89,8 @@
             >
               <WorkCard
                 :work="work"
-                :wordLimit="{ title: 100, text: 0 }"
-                :miniVariant="false"
+                :word-limit="{ title: 100, text: 0 }"
+                :mini-variant="false"
                 :mutation="isOwnProfile"
                 @remove-work="deleteWork"
               />
@@ -104,51 +104,51 @@
 </template>
 
 <script>
-import WorkCard from '~/components/WorkCard.vue'
-import PopZoom from '~/components/PopZoom.vue'
-import currentUser from '~/mixins/currentUser'
+import WorkCard from '~/components/WorkCard.vue';
+import PopZoom from '~/components/PopZoom.vue';
+import currentUser from '~/mixins/currentUser';
 
 export default {
   name: 'UserProfile',
-  middleware: 'auth',
+  components: { WorkCard, PopZoom },
   mixins: [currentUser],
+  middleware: 'auth',
   data: () => ({
     showPopZoom: false,
     profile: null,
   }),
   computed: {
     isOwnProfile() {
-      return this.me?.username === this.$route.params.username
+      return this.me?.username === this.$route.params.username;
     },
+  },
+  mounted() {
+    this.fetchProfile();
   },
   methods: {
     async fetchProfile() {
       // Viewing your own profile doesn't need a network round-trip - the
       // full user object is already in the store.
       if (this.isOwnProfile) {
-        this.profile = this.me
-        return
+        this.profile = this.me;
+        return;
       }
       try {
         const res = await this.$axios.get('/users', {
           params: { username: this.$route.params.username },
-        })
-        this.profile = res.data.data[0] || null
+        });
+        this.profile = res.data.data[0] || null;
       } catch (error) {
-        console.error('Error fetching user:', error)
+        console.error('Error fetching user:', error);
       }
     },
     deleteWork(id) {
       if (!window.confirm('Apakah anda ingin menghapus karya tulis ini??'))
-        return
+        return;
       this.$store.dispatch('deleteWork', id).then(() => {
-        this.fetchProfile()
-      })
+        this.fetchProfile();
+      });
     },
   },
-  components: { WorkCard, PopZoom },
-  mounted() {
-    this.fetchProfile()
-  },
-}
+};
 </script>

@@ -17,29 +17,29 @@ export const state = () => ({
   // users
   usersData: null,
   userData: null,
-})
+});
 
 export const mutations = {
   setToken(state, token) {
-    state.token = token
+    state.token = token;
   },
 
   setForYou(state, data) {
-    state.forYouData = data
+    state.forYouData = data;
   },
 
   setWorks(state, data) {
-    state.worksData = data
+    state.worksData = data;
   },
   setWork(state, data) {
-    state.workData = data
+    state.workData = data;
   },
 
   setUsers(state, data) {
-    state.usersData = data
+    state.usersData = data;
   },
   setUser(state, data) {
-    state.userData = data
+    state.userData = data;
   },
 
   // --- Disabled: no backing endpoint yet ---
@@ -74,7 +74,7 @@ export const mutations = {
   // removeLikeList (state, data) {
   //   state.userData.like_list = state.userData.like_list.filter(id => id !== data)
   // },
-}
+};
 
 export const actions = {
   // --- Recommendations (was /user_recommenders) ---
@@ -83,15 +83,15 @@ export const actions = {
       this.$axios
         .get(`/recommendations/${state.userData.id}`)
         .then((response) => {
-          const works = response.data.data
-          commit('setForYou', works)
-          resolve(works)
+          const works = response.data.data;
+          commit('setForYou', works);
+          resolve(works);
         })
         .catch((error) => {
-          console.error('Error fetching recommendations:', error)
-          reject(error)
-        })
-    })
+          console.error('Error fetching recommendations:', error);
+          reject(error);
+        });
+    });
   },
   updateRecommender({ state }, rating) {
     return new Promise((resolve, reject) => {
@@ -103,10 +103,10 @@ export const actions = {
         })
         .then((response) => resolve(response.data.data))
         .catch((error) => {
-          console.error('Error submitting rating:', error)
-          reject(error)
-        })
-    })
+          console.error('Error submitting rating:', error);
+          reject(error);
+        });
+    });
   },
 
   // --- Works ---
@@ -117,32 +117,32 @@ export const actions = {
           params: { page, limit, category },
         })
         .then((response) => {
-          const works = response.data.data
-          const total = response.data.meta?.total || 0
-          commit('setWorks', works)
+          const works = response.data.data;
+          const total = response.data.meta?.total || 0;
+          commit('setWorks', works);
           // Normalized shape for callers (see mixins/workListScroll.js).
-          resolve({ works, total })
+          resolve({ works, total });
         })
         .catch((error) => {
-          console.error('Error fetching works:', error)
-          reject(error)
-        })
-    })
+          console.error('Error fetching works:', error);
+          reject(error);
+        });
+    });
   },
   getWorkById({ commit }, id) {
     return new Promise((resolve, reject) => {
       this.$axios
         .get('/works/' + id)
         .then((response) => {
-          const work = response.data.data
-          commit('setWork', work)
-          resolve(work)
+          const work = response.data.data;
+          commit('setWork', work);
+          resolve(work);
         })
         .catch((error) => {
-          console.error('Error fetching work:', error)
-          reject(error)
-        })
-    })
+          console.error('Error fetching work:', error);
+          reject(error);
+        });
+    });
   },
   postWork({ commit }, data) {
     return new Promise((resolve, reject) => {
@@ -150,10 +150,10 @@ export const actions = {
         .post('/works', data)
         .then((response) => resolve(response.data.data))
         .catch((error) => {
-          console.error('Error creating work:', error)
-          reject(error)
-        })
-    })
+          console.error('Error creating work:', error);
+          reject(error);
+        });
+    });
   },
   updateWork({ commit }, work) {
     return new Promise((resolve, reject) => {
@@ -161,10 +161,10 @@ export const actions = {
         .put(`/works/${work.id}`, work)
         .then((response) => resolve(response.data.data))
         .catch((error) => {
-          console.error('Error updating work:', error)
-          reject(error)
-        })
-    })
+          console.error('Error updating work:', error);
+          reject(error);
+        });
+    });
   },
   deleteWork({ commit }, id) {
     return new Promise((resolve, reject) => {
@@ -172,10 +172,10 @@ export const actions = {
         .delete('/works/' + id)
         .then((response) => resolve(response.data.data))
         .catch((error) => {
-          console.error('Error deleting work:', error)
-          reject(error)
-        })
-    })
+          console.error('Error deleting work:', error);
+          reject(error);
+        });
+    });
   },
 
   // --- Users ---
@@ -184,30 +184,30 @@ export const actions = {
       this.$axios
         .get('/users', { params })
         .then((response) => {
-          const users = response.data.data
-          commit('setUsers', users)
-          resolve(users)
+          const users = response.data.data;
+          commit('setUsers', users);
+          resolve(users);
         })
         .catch((error) => {
-          console.error('Error fetching users:', error)
-          reject(error)
-        })
-    })
+          console.error('Error fetching users:', error);
+          reject(error);
+        });
+    });
   },
   getUserById({ commit }, id) {
     return new Promise((resolve, reject) => {
       this.$axios
         .get('/users/' + id)
         .then((response) => {
-          const user = response.data.data
-          commit('setUser', user)
-          resolve(user)
+          const user = response.data.data;
+          commit('setUser', user);
+          resolve(user);
         })
         .catch((error) => {
-          console.error('Error fetching user:', error)
-          reject(error)
-        })
-    })
+          console.error('Error fetching user:', error);
+          reject(error);
+        });
+    });
   },
   regis({ commit }, data) {
     return new Promise((resolve, reject) => {
@@ -219,10 +219,10 @@ export const actions = {
         })
         .then((response) => resolve(response.data.data))
         .catch((error) => {
-          console.error('Error registering:', error)
-          reject(error)
-        })
-    })
+          console.error('Error registering:', error);
+          reject(error);
+        });
+    });
   },
   login({ commit }, data) {
     return new Promise((resolve, reject) => {
@@ -232,25 +232,25 @@ export const actions = {
           password: data.password,
         })
         .then((response) => {
-          const { user, token } = response.data.data
-          commit('setUser', user)
-          commit('setToken', token)
+          const { user, token } = response.data.data;
+          commit('setUser', user);
+          commit('setToken', token);
           // Memory-only for now - attach it to the shared axios instance so
           // every subsequent request carries it. Lost on refresh until a
           // refresh-token/cookie flow exists on the backend.
-          this.$axios.setToken(token, 'Bearer')
-          resolve(user)
+          this.$axios.setToken(token, 'Bearer');
+          resolve(user);
         })
         .catch((error) => {
-          console.error('Error logging in:', error)
-          reject(error)
-        })
-    })
+          console.error('Error logging in:', error);
+          reject(error);
+        });
+    });
   },
   logout({ commit }) {
-    commit('setUser', null)
-    commit('setToken', null)
-    this.$axios.setToken(false)
+    commit('setUser', null);
+    commit('setToken', null);
+    this.$axios.setToken(false);
   },
 
   // --- Disabled: no backing endpoint yet (see mutations above) ---
@@ -260,25 +260,25 @@ export const actions = {
   // updateReadList ({ state, commit }, workId) { ... PUT /users/{id} { read_list } },
   // updateLikeList ({ state, commit }, workId) { ... PUT /users/{id} { like_list } },
   // removeLikeList ({ state, commit }, workId) { ... PUT /users/{id} { like_list } },
-}
+};
 
 export const getters = {
   works(state) {
-    return state.worksData
+    return state.worksData;
   },
   foryou(state) {
-    return state.forYouData
+    return state.forYouData;
   },
   work(state) {
-    return state.workData
+    return state.workData;
   },
   users(state) {
-    return state.usersData
+    return state.usersData;
   },
   me(state) {
-    return state.userData
+    return state.userData;
   },
   token(state) {
-    return state.token
+    return state.token;
   },
-}
+};

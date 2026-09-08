@@ -16,8 +16,8 @@
                 }"
               >
                 <v-img
-                  style="inset: 0; position: absolute"
                   v-if="fileOfCover"
+                  style="inset: 0; position: absolute"
                   height="100%"
                   cover
                   :src="work.cover"
@@ -56,15 +56,16 @@
               </v-radio-group> -->
               <!-- <v-divider></v-divider> -->
               <v-text-field
+                v-model="work.title"
                 outlined
                 dense
                 label="Judul"
                 hint="Pilih judul yang sesuai dan menarik pembaca"
                 persistent-hint
                 required
-                v-model="work.title"
               ></v-text-field>
               <v-autocomplete
+                v-model="work.category"
                 outlined
                 dense
                 multiple
@@ -77,9 +78,9 @@
                 persistent-hint
                 :counter="5"
                 :items="hashtags"
-                v-model="work.category"
               ></v-autocomplete>
               <v-file-input
+                v-model="fileOfCover"
                 outlined
                 dense
                 clearable
@@ -90,7 +91,6 @@
                 label="Cover"
                 hint="Direkomendasikan cover dengan ratio 13:19"
                 persistent-hint
-                v-model="fileOfCover"
                 @change="fileToImage"
               ></v-file-input>
               <v-btn-toggle v-model="attachment_type" class="mb-2">
@@ -104,26 +104,27 @@
               <v-row v-if="attachment_type === 0">
                 <v-col cols="12" sm="5">
                   <v-text-field
+                    v-model="work.attachment.title"
                     outlined
                     dense
                     label="Judul"
-                    v-model="work.attachment.title"
                   ></v-text-field>
                 </v-col>
                 <v-col cols="12" sm="7">
                   <v-text-field
+                    v-model="work.attachment.link"
                     outlined
                     dense
                     label="Link"
                     hint="Lampirkan tautan (Optional)"
                     persistent-hint
                     required
-                    v-model="work.attachment.link"
                   ></v-text-field>
                 </v-col>
               </v-row>
               <v-file-input
                 v-if="attachment_type === 1"
+                v-model="fileOfAttachment"
                 outlined
                 dense
                 clearable
@@ -134,7 +135,6 @@
                 label="File PDF"
                 hint="Lampirkan file PDF (Optional)"
                 persistent-hint
-                v-model="fileOfAttachment"
               ></v-file-input>
               <!-- @change="fileToLink" -->
             </v-col>
@@ -181,13 +181,14 @@
 </template>
 
 <script>
-import TiptapEditor from '~/components/TiptapEditor.vue'
-import currentUser from '../mixins/currentUser'
+import TiptapEditor from '~/components/TiptapEditor.vue';
+import currentUser from '../mixins/currentUser';
 
 export default {
   name: 'Write',
-  middleware: 'auth',
+  components: { TiptapEditor },
   mixins: [currentUser],
+  middleware: 'auth',
   data: () => ({
     loading: false,
     fileOfCover: null,
@@ -206,84 +207,83 @@ export default {
   }),
   computed: {
     hashtags() {
-      const hashtags = []
+      const hashtags = [];
       this.$store.state.hashtags.data.forEach((element) => {
-        hashtags.push(element.name)
-      })
-      return hashtags
+        hashtags.push(element.name);
+      });
+      return hashtags;
     },
+  },
+  beforeUnmount() {
+    if (this.work.cover && this.work.cover.startsWith('blob:')) {
+      URL.revokeObjectURL(this.work.cover);
+    }
   },
   methods: {
     async uploadFileToStorage(file) {
-      const storageRef = this.$fireModule.storage().ref()
+      const storageRef = this.$fireModule.storage().ref();
       // Namespace by timestamp so two uploads with the same filename (e.g.
       // "cover.jpg" from two different users) don't overwrite each other.
-      const fileRef = storageRef.child(`${Date.now()}-${file.name}`)
+      const fileRef = storageRef.child(`${Date.now()}-${file.name}`);
       try {
-        await fileRef.put(file)
-        return fileRef.getDownloadURL()
+        await fileRef.put(file);
+        return fileRef.getDownloadURL();
       } catch (error) {
-        console.error('Error uploading file:', error)
-        throw error
+        console.error('Error uploading file:', error);
+        throw error;
       }
     },
     async postWork() {
-      this.loading = true
-      this.errorMessage = ''
+      this.loading = true;
+      this.errorMessage = '';
       try {
-        this.work.writer = this.me.id
+        this.work.writer = this.me.id;
 
         // Upload cover
         if (this.fileOfCover) {
-          this.work.cover = await this.uploadFileToStorage(this.fileOfCover)
+          this.work.cover = await this.uploadFileToStorage(this.fileOfCover);
         } else {
-          this.work.cover = '/temp-profile.webp'
+          this.work.cover = '/temp-profile.webp';
         }
 
         // Upload attachment
         if (this.fileOfAttachment) {
           const attachmentLink = await this.uploadFileToStorage(
             this.fileOfAttachment
-          )
+          );
           this.work.attachment = {
             title: this.fileOfAttachment.name,
             link: attachmentLink,
-          }
+          };
         } else if (this.work.attachment.link) {
           if (!this.work.attachment.title) {
-            this.work.attachment.title = 'Lampiran'
+            this.work.attachment.title = 'Lampiran';
           }
         } else {
-          this.work.attachment = {}
+          this.work.attachment = {};
         }
 
-        await this.$store.dispatch('postWork', this.work)
+        await this.$store.dispatch('postWork', this.work);
 
-        this.success = true
+        this.success = true;
         setTimeout(() => {
-          this.$router.push('/home')
-        }, 1000)
+          this.$router.push('/home');
+        }, 1000);
       } catch (error) {
-        console.error('Error uploading work:', error)
-        this.errorMessage = 'Gagal mengunggah karya tulis. Silakan coba lagi.'
+        console.error('Error uploading work:', error);
+        this.errorMessage = 'Gagal mengunggah karya tulis. Silakan coba lagi.';
       } finally {
-        this.loading = false
+        this.loading = false;
       }
     },
     fileToImage() {
       if (this.fileOfCover) {
         if (this.work.cover && this.work.cover.startsWith('blob:')) {
-          URL.revokeObjectURL(this.work.cover)
+          URL.revokeObjectURL(this.work.cover);
         }
-        this.work.cover = URL.createObjectURL(this.fileOfCover)
+        this.work.cover = URL.createObjectURL(this.fileOfCover);
       }
     },
   },
-  components: { TiptapEditor },
-  beforeDestroy() {
-    if (this.work.cover && this.work.cover.startsWith('blob:')) {
-      URL.revokeObjectURL(this.work.cover)
-    }
-  },
-}
+};
 </script>

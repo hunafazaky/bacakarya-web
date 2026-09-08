@@ -13,8 +13,8 @@
             >
               <WorkCard
                 :work="work"
-                :wordLimit="{ title: 100, text: 0 }"
-                :miniVariant="false"
+                :word-limit="{ title: 100, text: 0 }"
+                :mini-variant="false"
                 :mutation="false"
                 @remove-work="deleteWork"
               />
@@ -37,8 +37,8 @@
             >
               <WorkCard
                 :work="work"
-                :wordLimit="{ title: 100, text: 0 }"
-                :miniVariant="false"
+                :word-limit="{ title: 100, text: 0 }"
+                :mini-variant="false"
                 :mutation="false"
                 @remove-work="deleteWork"
               />
@@ -112,36 +112,36 @@
 </template>
 
 <script>
-import WorkCard from '../components/WorkCard.vue'
-import LoadingComponent from '../components/LoadingComponent.vue'
-import currentUser from '../mixins/currentUser'
-import workListScroll from '../mixins/workListScroll'
+import WorkCard from '../components/WorkCard.vue';
+import LoadingComponent from '../components/LoadingComponent.vue';
+import currentUser from '../mixins/currentUser';
+import workListScroll from '../mixins/workListScroll';
 
 export default {
   name: 'Home',
-  middleware: 'auth',
-  mixins: [currentUser, workListScroll],
   components: {
     WorkCard,
     LoadingComponent,
   },
+  mixins: [currentUser, workListScroll],
+  middleware: 'auth',
   computed: {
     foryou() {
-      return this.$store.getters.foryou
+      return this.$store.getters.foryou;
     },
     foryouPreview() {
-      return (this.foryou || []).slice(0, 6)
+      return (this.foryou || []).slice(0, 6);
     },
+  },
+  mounted() {
+    this.$store.dispatch('getForYou');
   },
   methods: {
     // Refresh the sidebar's "recently written" list after deleting a work
     // (see mixins/workListScroll.js).
     afterWorkDeleted() {
-      if (this.me) this.$store.dispatch('getUserById', this.me.id)
+      if (this.me) this.$store.dispatch('getUserById', this.me.id);
     },
   },
-  mounted() {
-    this.$store.dispatch('getForYou')
-  },
-}
+};
 </script>

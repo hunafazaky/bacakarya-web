@@ -1,12 +1,12 @@
 <template>
   <div>
     <LoadingPage :loading="loading" />
-    <v-row justify="space-between" v-if="work">
+    <v-row v-if="work" justify="space-between">
       <PopZoom
-        maxWidth="500px"
+        max-width="500px"
         :image="work.cover"
-        :showPopZoom="showPopZoom"
-        @hidePopZoom="showPopZoom = false"
+        :show-pop-zoom="showPopZoom"
+        @hide-pop-zoom="showPopZoom = false"
       />
       <v-col class="my-5" cols="12" md="7">
         <h1
@@ -24,7 +24,6 @@
             <v-row justify="center">
               <v-col sm="6" md="12">
                 <v-sheet
-                  @click.stop="showPopZoom = true"
                   outlined
                   rounded="lg"
                   width="100%"
@@ -33,6 +32,7 @@
                     'padding-top': 100 * (19 / 13) + '%',
                     position: 'relative',
                   }"
+                  @click.stop="showPopZoom = true"
                 >
                   <v-img
                     style="inset: 0; position: absolute"
@@ -43,7 +43,7 @@
                 </v-sheet>
               </v-col>
               <v-col sm="6" md="12">
-                <div class="my-5" v-if="work.writer">
+                <div v-if="work.writer" class="my-5">
                   <p class="caption font-weight-bold my-0">Penulis :</p>
                   <nuxt-link
                     :to="`/user/${work.writer.username}`"
@@ -56,8 +56,8 @@
                   </nuxt-link>
                 </div>
                 <div
-                  class="my-5"
                   v-if="work.category && work.category.length > 0"
+                  class="my-5"
                 >
                   <p class="caption font-weight-bold my-0">Kategori :</p>
                   <span
@@ -69,8 +69,8 @@
                   </span>
                 </div>
                 <div
-                  class="my-5"
                   v-if="work.attachment && work.attachment.link"
+                  class="my-5"
                 >
                   <p class="caption font-weight-bold my-0">Lampiran :</p>
                   <v-btn
@@ -91,10 +91,10 @@
                     Berikan Penilaian Anda
                   </p>
                   <v-rating
+                    v-model="rating"
                     hover
                     :length="5"
                     :size="32"
-                    v-model="rating"
                     @input="sendRating"
                   />
                 </div>
@@ -108,14 +108,15 @@
 </template>
 
 <script>
-import PopZoom from '~/components/PopZoom.vue'
-import LoadingPage from '~/components/LoadingPage.vue'
-import currentUser from '~/mixins/currentUser'
+import PopZoom from '~/components/PopZoom.vue';
+import LoadingPage from '~/components/LoadingPage.vue';
+import currentUser from '~/mixins/currentUser';
 
 export default {
   name: 'Read',
-  middleware: 'auth',
+  components: { PopZoom, LoadingPage },
   mixins: [currentUser],
+  middleware: 'auth',
   data: () => ({
     showPopZoom: false,
     loading: true,
@@ -123,29 +124,33 @@ export default {
   }),
   computed: {
     work() {
-      return this.$store.getters.work
+      return this.$store.getters.work;
     },
+  },
+  mounted() {
+    this.getRating();
+    this.loadWork();
   },
   methods: {
     getRating() {
-      const rateList = this.me?.rate_list || []
+      const rateList = this.me?.rate_list || [];
       const found = rateList.find(
         (item) => item.work_id === this.$route.params.id
-      )
-      this.rating = found?.rating ?? null
+      );
+      this.rating = found?.rating ?? null;
     },
     async loadWork() {
-      this.loading = true
+      this.loading = true;
       try {
-        await this.$store.dispatch('getWorkById', this.$route.params.id)
+        await this.$store.dispatch('getWorkById', this.$route.params.id);
         // TODO: marking a work as "read" (readers/read_list) has no backing
         // endpoint yet - see store/index.js. Re-enable when one exists:
         // await this.$store.dispatch('updateReadList', work.id)
         // await this.$store.dispatch('updateReaders', work)
       } catch (error) {
-        console.error('Error fetching work:', error)
+        console.error('Error fetching work:', error);
       } finally {
-        this.loading = false
+        this.loading = false;
       }
     },
     sendRating() {
@@ -154,16 +159,11 @@ export default {
       // server-side, so we don't PUT those directly ourselves.
       this.$store
         .dispatch('updateRecommender', this.rating)
-        .catch((error) => console.error('Error updating rating:', error))
+        .catch((error) => console.error('Error updating rating:', error));
     },
     openLink(link) {
-      window.open(link, '_blank')
+      window.open(link, '_blank');
     },
   },
-  components: { PopZoom, LoadingPage },
-  mounted() {
-    this.getRating()
-    this.loadWork()
-  },
-}
+};
 </script>

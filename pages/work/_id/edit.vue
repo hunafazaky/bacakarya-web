@@ -16,8 +16,8 @@
                 }"
               >
                 <v-img
-                  style="inset: 0; position: absolute"
                   v-if="work.cover"
+                  style="inset: 0; position: absolute"
                   height="100%"
                   cover
                   :src="work.cover"
@@ -30,15 +30,16 @@
             </v-col>
             <v-col cols="8" md="9">
               <v-text-field
+                v-model="work.title"
                 outlined
                 dense
                 label="Judul"
                 hint="Pilih judul yang sesuai dan menarik pembaca"
                 persistent-hint
                 required
-                v-model="work.title"
               ></v-text-field>
               <v-autocomplete
+                v-model="work.category"
                 outlined
                 dense
                 multiple
@@ -51,9 +52,9 @@
                 persistent-hint
                 :counter="5"
                 :items="hashtags"
-                v-model="work.category"
               ></v-autocomplete>
               <v-file-input
+                v-model="file"
                 outlined
                 dense
                 clearable
@@ -64,7 +65,6 @@
                 label="Cover"
                 hint="Direkomendasikan cover dengan ratio 13:19"
                 persistent-hint
-                v-model="file"
                 @change="fileToImage"
               ></v-file-input>
             </v-col>
@@ -111,19 +111,20 @@
 </template>
 
 <script>
-import TiptapEditor from '~/components/TiptapEditor.vue'
-import currentUser from '~/mixins/currentUser'
+import TiptapEditor from '~/components/TiptapEditor.vue';
+import currentUser from '~/mixins/currentUser';
 
 export default {
   name: 'Edit',
-  middleware: 'auth',
+  components: { TiptapEditor },
   mixins: [currentUser],
+  middleware: 'auth',
   // NOTE: this used to fetch the work into a { content: {...}, keyword: {...} }
   // shape that didn't match what write.vue / the store / WorkCard use
   // everywhere else (flat title/text/cover/category). Normalized to match.
   async asyncData({ params, $axios }) {
-    const res = await $axios.$get(`/works/${params.id}`)
-    const work = res.data
+    const res = await $axios.$get(`/works/${params.id}`);
+    const work = res.data;
     return {
       work: {
         id: work.id,
@@ -134,7 +135,7 @@ export default {
         attachment: work.attachment || {},
         writer: work.writer,
       },
-    }
+    };
   },
   data: () => ({
     file: null,
@@ -144,48 +145,47 @@ export default {
   }),
   computed: {
     hashtags() {
-      const hashtags = []
+      const hashtags = [];
       this.$store.state.hashtags.data.forEach((element) => {
-        hashtags.push(element.name)
-      })
-      return hashtags
+        hashtags.push(element.name);
+      });
+      return hashtags;
     },
+  },
+  beforeUnmount() {
+    if (this.work.cover && this.work.cover.startsWith('blob:')) {
+      URL.revokeObjectURL(this.work.cover);
+    }
   },
   methods: {
     putWork() {
-      this.loading = true
-      this.errorMessage = ''
+      this.loading = true;
+      this.errorMessage = '';
       this.$store
         .dispatch('updateWork', this.work)
         .then(() => {
-          this.success = true
+          this.success = true;
           setTimeout(() => {
-            this.$router.push('/home')
-          }, 1000)
+            this.$router.push('/home');
+          }, 1000);
         })
         .catch((error) => {
-          console.error('Error updating work:', error)
+          console.error('Error updating work:', error);
           this.errorMessage =
-            'Gagal memperbarui karya tulis. Silakan coba lagi.'
+            'Gagal memperbarui karya tulis. Silakan coba lagi.';
         })
         .finally(() => {
-          this.loading = false
-        })
+          this.loading = false;
+        });
     },
     fileToImage() {
       if (this.file) {
         if (this.work.cover && this.work.cover.startsWith('blob:')) {
-          URL.revokeObjectURL(this.work.cover)
+          URL.revokeObjectURL(this.work.cover);
         }
-        this.work.cover = URL.createObjectURL(this.file)
+        this.work.cover = URL.createObjectURL(this.file);
       }
     },
   },
-  components: { TiptapEditor },
-  beforeDestroy() {
-    if (this.work.cover && this.work.cover.startsWith('blob:')) {
-      URL.revokeObjectURL(this.work.cover)
-    }
-  },
-}
+};
 </script>

@@ -8,7 +8,7 @@
 export default {
   computed: {
     me() {
-      return this.$store.getters.me
+      return this.$store.getters.me;
     },
   },
-}
+};

@@ -8,4 +8,4 @@ export const state = () => ({
     { id: 3, name: 'Travel' },
     { id: 4, name: 'Otomotif' },
   ],
-})
+});

@@ -48,7 +48,7 @@
           "
         ></v-card-text>
         <v-card-actions>
-          <div class="absolute bottom" v-if="miniVariant === true">
+          <div v-if="miniVariant === true" class="absolute bottom">
             <v-btn icon class="mb-1" color="primary">
               <v-icon> mdi-text-box-check </v-icon>
             </v-btn>
@@ -81,7 +81,7 @@
               </v-btn>
             </template>
           </div>
-          <div class="mx-2 absolute bottom" v-else>
+          <div v-else class="mx-2 absolute bottom">
             <v-row>
               <v-col cols="12" class="ma-0 pa-0">
                 <v-btn v-if="work.category && work.category[0]" x-small plain>
@@ -162,7 +162,7 @@ export default {
         return {
           numbers: 100,
           units: '%',
-        }
+        };
       },
     },
   },
@@ -174,19 +174,19 @@ export default {
   }),
   computed: {
     me() {
-      return this.$store.getters.me
+      return this.$store.getters.me;
     },
     isOwner() {
       return (
         !!this.work.writer &&
         !!this.me &&
         this.work.writer.username === this.me.username
-      )
+      );
     },
   },
   methods: {
     removeWork(id) {
-      this.$emit('remove-work', id)
+      this.$emit('remove-work', id);
     },
     // TODO: re-enable once liking a work has a backing endpoint.
     // likeCheck() {
@@ -218,5 +218,5 @@ export default {
     //   }
     // },
   },
-}
+};
 </script>
