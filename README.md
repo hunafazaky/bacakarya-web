@@ -1,68 +1,90 @@
-# bacakarya-web
+# vuetify-project
 
-## Build Setup
+Scaffolded with Vuetify CLI.
+
+## ❗️ Documentation
+
+- Primary docs: https://vuetifyjs.com/
+- Getting started guide: https://vuetifyjs.com/en/getting-started/installation/
+- Community support: https://community.vuetifyjs.com/
+- Issue tracker: https://issues.vuetifyjs.com/
+
+## 🧱 Stack
+
+- Framework: Nuxt 4
+- UI Library: Vuetify
+- Language: TypeScript
+- Package manager: bun
+
+## 🧭 Start Here
+
+- Main entry: `app/app.vue`
+- Main app component: `app/app.vue`
+- Main styles: `app/assets/styles/`
+- Plugin setup: `app/plugins/`
+
+## 📁 Project Structure
+
+- `app/pages/` — application routes
+- `app/components/` — reusable Vue components
+- `app/assets/` — styles and static assets used in app
+- `app/plugins/` — Nuxt plugins
+- `public/` — static public files
+
+## ✨ Enabled Features
+
+- ESLint
+- Pinia
+- Vuetify MCP
+- Client Hints
+
+## 💿 Install
+
+Use your selected package manager (bun) to install dependencies:
 
 ```bash
-# install dependencies
-$ yarn install
-
-# serve with hot reload at localhost:3000
-$ yarn dev
-
-# build for production and launch server
-$ yarn build
-$ yarn start
-
-# generate static project
-$ yarn generate
+bun install
 ```
 
-For detailed explanation on how things work, check out the [documentation](https://nuxtjs.org).
+## 🚀 Quick Start
 
-## Special Directories
+```bash
+bun install
+bun dev
+```
 
-You can create the following extra directories, some of which have special behaviors. Only `pages` is required; you can delete them if you don't want to use their functionality.
+## 🏗️ Build
 
-### `assets`
+```bash
+bun build
+```
 
-The assets directory contains your uncompiled assets such as Stylus or Sass files, images, or fonts.
+## 🧪 Available Scripts
 
-More information about the usage of this directory in [the documentation](https://nuxtjs.org/docs/2.x/directory-structure/assets).
+- `bun build`
+- `bun dev`
+- `bun generate`
+- `bun preview`
+- `bun postinstall`
+- `bun lint`
+- `bun lint:fix`
 
-### `components`
+## 🤖 Vuetify MCP Server
 
-The components directory contains your Vue.js components. Components make up the different parts of your page and can be reused and imported into your pages, layouts and even other components.
+This project is configured with the Vuetify Model Context Protocol (MCP) server.
+To install and configure the MCP server for your favorite IDE (Cursor, Trae, Windsurf, VS Code, Claude Desktop, etc.) run:
 
-More information about the usage of this directory in [the documentation](https://nuxtjs.org/docs/2.x/directory-structure/components).
+```bash
+bunx @vuetify/mcp-cli
+```
 
-### `layouts`
+This will open an interactive setup wizard to help you connect your AI assistant to the Vuetify ecosystem.
 
-Layouts are a great help when you want to change the look and feel of your Nuxt app, whether you want to include a sidebar or have distinct layouts for mobile and desktop.
+## 💪 Support Vuetify Development
 
-More information about the usage of this directory in [the documentation](https://nuxtjs.org/docs/2.x/directory-structure/layouts).
+This project uses Vuetify - an MIT licensed Open Source project. We are glad to welcome contributors and any support for ongoing development:
 
-### `pages`
-
-This directory contains your application views and routes. Nuxt will read all the `*.vue` files inside this directory and setup Vue Router automatically.
-
-More information about the usage of this directory in [the documentation](https://nuxtjs.org/docs/2.x/get-started/routing).
-
-### `plugins`
-
-The plugins directory contains JavaScript plugins that you want to run before instantiating the root Vue.js Application. This is the place to add Vue plugins and to inject functions or constants. Every time you need to use `Vue.use()`, you should create a file in `plugins/` and add its path to plugins in `nuxt.config.js`.
-
-More information about the usage of this directory in [the documentation](https://nuxtjs.org/docs/2.x/directory-structure/plugins).
-
-### `static`
-
-This directory contains your static files. Each file inside this directory is mapped to `/`.
-
-Example: `/static/robots.txt` is mapped as `/robots.txt`.
-
-More information about the usage of this directory in [the documentation](https://nuxtjs.org/docs/2.x/directory-structure/static).
-
-### `store`
-
-This directory contains your Vuex store files. Creating a file in this directory automatically activates Vuex.
-
-More information about the usage of this directory in [the documentation](https://nuxtjs.org/docs/2.x/directory-structure/store).
+- Contribute to Vuetify and ecosystem projects: https://github.com/vuetifyjs
+- Request enterprise support: https://support.vuetifyjs.com/
+- Sponsor on GitHub: https://github.com/sponsors/vuetifyjs
+- Support on Open Collective: https://opencollective.com/vuetify
