@@ -1,0 +1,1060 @@
+openapi: 3.0.3
+info:
+  title: bacakarya-api
+  description: >
+    API for a reading/writing platform - users, works, an ML-based work
+    classifier, and a collaborative-filtering recommender.
+
+
+    All success responses share the shape `{ data, message, meta? }` and
+    all error responses share `{ data: null, message }`.
+  version: 1.7.1
+servers:
+  - url: /api
+
+tags:
+  - name: Users
+  - name: Works
+  - name: Classifications
+    description: Trains and serves the shared work-category classifier.
+  - name: Recommendations
+    description: Trains and serves per-user work recommendations.
+
+security: []
+
+paths:
+  /users:
+    post:
+      tags: [Users]
+      summary: Register a new user
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+      responses:
+        '201':
+          description: User created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '409':
+          description: Username already taken
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    get:
+      tags: [Users]
+      summary: List users
+      security: []
+      parameters:
+        - in: query
+          name: username
+          schema:
+            type: string
+          description: Filter by exact username
+      responses:
+        '200':
+          description: List of users
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserListResponse'
+    delete:
+      tags: [Users]
+      summary: Delete all users
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          $ref: '#/components/responses/Deleted'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /users/login:
+    post:
+      tags: [Users]
+      summary: Log in
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponseEnvelope'
+        '401':
+          description: Incorrect username or password
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /users/{id}:
+    parameters:
+      - $ref: '#/components/parameters/IdParam'
+    get:
+      tags: [Users]
+      summary: Get a user by id
+      security: []
+      responses:
+        '200':
+          description: The user
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    put:
+      tags: [Users]
+      summary: Update your own account
+      description: Only `pen_name` and `photo` can be changed here. Requires the token to belong to this user id.
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserUpdateRequest'
+      responses:
+        '200':
+          description: Updated user
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+    delete:
+      tags: [Users]
+      summary: Delete your own account
+      description: Also deletes all works this user wrote. Requires the token to belong to this user id.
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          $ref: '#/components/responses/Deleted'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /works:
+    post:
+      tags: [Works]
+      summary: Create a work
+      description: >
+        multipart/form-data. The writer is taken from the auth token,
+        not from the request body. `cover` (max 2MB) and `attachment`
+        (max 10MB) are uploaded files, both optimized/re-hosted
+        server-side; `attachmentTitle` is a plain text label stored
+        alongside the attachment's hosted URL. `category` is an array
+        sent as repeated `category` fields (one text part per value) -
+        this is the standard multipart array encoding (`style: form,
+        explode: true`), which is what most OpenAPI-aware tooling
+        renders by default for an array field in a form. A
+        JSON-encoded array string (e.g. '["Fiction","Drama"]') in a
+        single `category` field is also accepted, as is a single plain
+        string for a one-item category.
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/WorkCreateForm'
+            encoding:
+              cover:
+                contentType: image/*
+              attachment:
+                contentType: '*/*'
+              category:
+                style: form
+                explode: true
+      responses:
+        '201':
+          description: Created work
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkResponse'
+        '400':
+          description: Invalid input, or cover/attachment file too large, wrong field name, cover not an image, or unreadable image data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '502':
+          description: Cover or attachment upload to storage failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    get:
+      tags: [Works]
+      summary: List works (paginated)
+      security: []
+      parameters:
+        - in: query
+          name: title
+          schema:
+            type: string
+          description: Case-insensitive substring match
+        - in: query
+          name: category
+          schema:
+            type: string
+        - in: query
+          name: page
+          schema:
+            type: integer
+            default: 1
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            default: 10
+      responses:
+        '200':
+          description: Paginated works
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkListResponse'
+    delete:
+      tags: [Works]
+      summary: Delete all works
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          $ref: '#/components/responses/Deleted'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /works/many:
+    post:
+      tags: [Works]
+      summary: Create several works at once
+      description: >
+        The writer of every item is taken from the auth token, not from
+        the request body. Body is `{ "works": [...] }`.
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [works]
+              properties:
+                works:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/WorkCreateRequest'
+      responses:
+        '201':
+          description: Created works
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkListResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /works/{id}:
+    parameters:
+      - $ref: '#/components/parameters/IdParam'
+    get:
+      tags: [Works]
+      summary: Get a work by id
+      security: []
+      responses:
+        '200':
+          description: The work
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    put:
+      tags: [Works]
+      summary: Update your own work
+      description: >
+        multipart/form-data. Only `title`, `cover`, `attachment`,
+        `attachmentTitle`, `text`, `category` can be changed, and only
+        by the work's writer. `cover`/`attachment` are optional here -
+        omit either to leave the existing value unchanged; include a
+        new file to replace it (max 2MB for cover, 10MB for attachment,
+        both re-hosted server-side). `category` is an array sent as
+        repeated `category` fields (one text part per value) - the
+        standard multipart array encoding (`style: form, explode:
+        true`). A JSON-encoded array string or a single plain string
+        are also accepted.
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/WorkUpdateForm'
+            encoding:
+              cover:
+                contentType: image/*
+              attachment:
+                contentType: '*/*'
+              category:
+                style: form
+                explode: true
+      responses:
+        '200':
+          description: Updated work
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkResponse'
+        '400':
+          description: Invalid input, or cover/attachment file too large, wrong field name, cover not an image, or unreadable image data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '502':
+          description: Cover or attachment upload to storage failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    delete:
+      tags: [Works]
+      summary: Delete your own work
+      description: Requires the token to belong to the work's writer.
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          $ref: '#/components/responses/Deleted'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /works/{id}/read:
+    parameters:
+      - $ref: '#/components/parameters/IdParam'
+    post:
+      tags: [Works]
+      summary: Mark a work as read by yourself
+      description: >
+        Adds the authenticated user to Work.readers and the work to
+        User.read_list in one call - the two fields are always updated
+        together. Idempotent: reading the same work twice has no
+        further effect.
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Updated work
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /works/{id}/like:
+    parameters:
+      - $ref: '#/components/parameters/IdParam'
+    post:
+      tags: [Works]
+      summary: Like a work as yourself
+      description: >
+        Adds the authenticated user to Work.like_by and the work to
+        User.like_list in one call. Idempotent.
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Updated work
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    delete:
+      tags: [Works]
+      summary: Unlike a work as yourself
+      description: >
+        Removes the authenticated user from Work.like_by and the work
+        from User.like_list in one call. Idempotent.
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Updated work
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /classifications:
+    post:
+      tags: [Classifications]
+      summary: Retrain the classifier from every existing work
+      description: Any authenticated user for now (no admin role yet).
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: The retrained classifier's serialized model
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TrainedModelResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    delete:
+      tags: [Classifications]
+      summary: Delete all classification records
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          $ref: '#/components/responses/Deleted'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /classifications/{id}:
+    parameters:
+      - $ref: '#/components/parameters/IdParam'
+    put:
+      tags: [Classifications]
+      summary: Teach the classifier a title/category example
+      description: '`id` is accepted for backward compatibility but not used - there is only ever one active classification model.'
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                category:
+                  type: array
+                  items:
+                    type: string
+      responses:
+        '200':
+          description: Updated classification model
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClassificationResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    delete:
+      tags: [Classifications]
+      summary: Delete a classification record by id
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          $ref: '#/components/responses/Deleted'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /recommendations:
+    post:
+      tags: [Recommendations]
+      summary: Retrain the recommendation table from every work's ratings
+      description: Any authenticated user for now (no admin role yet).
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: The retrained ratings table
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TrainedModelResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    get:
+      tags: [Recommendations]
+      summary: List all recommendation records
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: List of recommendation records
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecommendationListResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    put:
+      tags: [Recommendations]
+      summary: Submit a rating
+      description: '`user_id` in the body must match the authenticated user - you can only rate as yourself.'
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RatingRequest'
+      responses:
+        '200':
+          description: Updated recommendation record
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecommendationResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+    delete:
+      tags: [Recommendations]
+      summary: Delete all recommendation records
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          $ref: '#/components/responses/Deleted'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /recommendations/{id}:
+    parameters:
+      - $ref: '#/components/parameters/IdParam'
+    get:
+      tags: [Recommendations]
+      summary: Get recommended works for a user
+      description: '`id` is a user id. Requires the token to belong to this user.'
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Recommended works, ordered by predicted priority
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkListDataResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+    delete:
+      tags: [Recommendations]
+      summary: Delete a recommendation record by id
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          $ref: '#/components/responses/Deleted'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Obtain a token from POST /users/login.
+
+  parameters:
+    IdParam:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: string
+      description: MongoDB ObjectId
+
+  responses:
+    BadRequest:
+      description: Invalid input
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Unauthorized:
+      description: Missing or invalid token
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Forbidden:
+      description: Authenticated, but not allowed to act on this resource
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Deleted:
+      description: Deleted
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/DeletedResponse'
+
+  schemas:
+    # --- Envelope / error shapes ---
+    Error:
+      type: object
+      properties:
+        data:
+          nullable: true
+          example: null
+        message:
+          type: string
+
+    DeletedResponse:
+      type: object
+      properties:
+        data:
+          nullable: true
+          example: null
+        message:
+          type: string
+
+    PaginationMeta:
+      type: object
+      properties:
+        total:
+          type: integer
+        page:
+          type: integer
+        totalPages:
+          type: integer
+
+    TrainedModelResponse:
+      description: Wraps a raw, internal model object - shape is implementation-specific and not part of the stable contract.
+      type: object
+      properties:
+        data:
+          type: object
+        message:
+          type: string
+          nullable: true
+
+    # --- Auth / users ---
+    RegisterRequest:
+      type: object
+      required: [username, pen_name, password]
+      properties:
+        username:
+          type: string
+        pen_name:
+          type: string
+        password:
+          type: string
+          format: password
+
+    LoginRequest:
+      type: object
+      required: [username, password]
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+          format: password
+
+    LoginResponse:
+      type: object
+      properties:
+        user:
+          $ref: '#/components/schemas/User'
+        token:
+          type: string
+          description: 'JWT, valid for 7 days. Send as `Authorization: Bearer <token>`.'
+
+    LoginResponseEnvelope:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/LoginResponse'
+        message:
+          type: string
+          nullable: true
+
+    UserUpdateRequest:
+      type: object
+      properties:
+        pen_name:
+          type: string
+        photo:
+          type: string
+          format: uri
+
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+        username:
+          type: string
+        pen_name:
+          type: string
+        photo:
+          type: string
+          format: uri
+        work_list:
+          type: array
+          items:
+            type: string
+          description: Work ids (or populated Work objects, depending on the endpoint)
+        read_list:
+          type: array
+          items:
+            type: string
+        like_list:
+          type: array
+          items:
+            type: string
+        rate_list:
+          type: array
+          items:
+            $ref: '#/components/schemas/UserRating'
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    UserRating:
+      type: object
+      properties:
+        work_id:
+          type: string
+        rating:
+          type: number
+
+    UserResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/User'
+        message:
+          type: string
+          nullable: true
+
+    UserListResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/User'
+        message:
+          type: string
+          nullable: true
+
+    # --- Works ---
+    WorkCreateRequest:
+      description: Used by POST /works/many, where cover is already a hosted URL rather than a file.
+      type: object
+      required: [title, cover, text, category]
+      properties:
+        title:
+          type: string
+        cover:
+          type: string
+          format: uri
+        attachment:
+          $ref: '#/components/schemas/Attachment'
+        text:
+          type: string
+        category:
+          type: array
+          items:
+            type: string
+          description: Author-chosen categories; the classifier's own suggestion is prepended server-side.
+
+    WorkCreateForm:
+      description: >
+        multipart/form-data body for POST /works. `category` is typed
+        here as its real JSON shape; see the operation's `encoding`
+        block for how it's actually transmitted as a multipart part.
+      type: object
+      required: [title, cover, text, category]
+      properties:
+        title:
+          type: string
+        cover:
+          type: string
+          format: binary
+          description: Image file, max 2MB. Resized and re-encoded server-side before storage.
+        attachment:
+          type: string
+          format: binary
+          description: >
+            Optional file (max 10MB) - a PDF, audio, or other
+            supplementary file for the work. Not necessarily an image,
+            so it's stored as-is (no resize/re-encode). Uploaded and
+            combined with `attachmentTitle` into the work's
+            `{ title, link }` attachment field.
+        attachmentTitle:
+          type: string
+          description: Label for the attachment. Falls back to the uploaded file's own name if omitted.
+        text:
+          type: string
+        category:
+          type: array
+          items:
+            type: string
+          description: Author-chosen categories; the classifier's own suggestion is prepended server-side.
+
+    WorkUpdateForm:
+      description: >
+        multipart/form-data body for PUT /works/{id}. All fields
+        optional; omit `cover`/`attachment` to leave the existing
+        values unchanged. `category` is typed here as its real JSON
+        shape; see the operation's `encoding` block for how it's
+        actually transmitted as a multipart part.
+      type: object
+      properties:
+        title:
+          type: string
+        cover:
+          type: string
+          format: binary
+          description: Image file, max 2MB. Replaces the existing cover if provided.
+        attachment:
+          type: string
+          format: binary
+          description: Optional file, max 10MB. Replaces the existing attachment if provided.
+        attachmentTitle:
+          type: string
+          description: Label for the new attachment, if one is being uploaded.
+        text:
+          type: string
+        category:
+          type: array
+          items:
+            type: string
+
+    Attachment:
+      type: object
+      properties:
+        title:
+          type: string
+        link:
+          type: string
+          format: uri
+
+    Work:
+      type: object
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        cover:
+          type: string
+          format: uri
+        attachment:
+          $ref: '#/components/schemas/Attachment'
+        writer:
+          type: string
+          description: User id (or a populated User object, depending on the endpoint)
+        readers:
+          type: array
+          items:
+            type: string
+        like_by:
+          type: array
+          items:
+            type: string
+        rate_by:
+          type: array
+          items:
+            $ref: '#/components/schemas/WorkRating'
+        category:
+          type: array
+          items:
+            type: string
+        text:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    WorkRating:
+      type: object
+      properties:
+        user_id:
+          type: string
+        rating:
+          type: number
+
+    WorkResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/Work'
+        message:
+          type: string
+          nullable: true
+
+    WorkListResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Work'
+        message:
+          type: string
+          nullable: true
+        meta:
+          $ref: '#/components/schemas/PaginationMeta'
+
+    WorkListDataResponse:
+      description: Like WorkListResponse but without pagination meta (e.g. a recommendation list).
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Work'
+        message:
+          type: string
+          nullable: true
+
+    # --- Classification ---
+    Classification:
+      type: object
+      properties:
+        id:
+          type: string
+        data_trained:
+          type: object
+          description: Serialized Bayes classifier model.
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    ClassificationResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/Classification'
+        message:
+          type: string
+          nullable: true
+
+    # --- Recommendation ---
+    Recommendation:
+      type: object
+      properties:
+        id:
+          type: string
+        data_trained:
+          type: object
+          description: Serialized ratings table (rows = works, columns = users).
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    RecommendationResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/Recommendation'
+        message:
+          type: string
+          nullable: true
+
+    RecommendationListResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Recommendation'
+        message:
+          type: string
+          nullable: true
+
+    RatingRequest:
+      type: object
+      required: [work_id, user_id, rating]
+      properties:
+        work_id:
+          type: string
+        user_id:
+          type: string
+          description: Must match the authenticated user's id.
+        rating:
+          type: number

@@ -1,5 +1,5 @@
 {
-  "name": "vuetify-project",
+  "name": "bacakarya-web-v2",
   "private": true,
   "type": "module",
   "scripts": {
@@ -9,23 +9,29 @@
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
     "lint": "eslint",
-    "lint:fix": "eslint --fix"
+    "lint:fix": "eslint --fix",
+    "gen:types": "openapi-typescript api-reference/openapi.yaml -o shared/types/api.d.ts",
+    "typecheck": "nuxt typecheck"
   },
   "dependencies": {
     "@mdi/font": "7.4.47",
+    "isomorphic-dompurify": "^4.3.0",
     "nuxt": "^4.4.2",
+    "pinia": "^3.0.4",
     "vue": "^3.5.30",
     "vuetify": "^4.0.2",
-    "vuetify-nuxt-module": "^1.0.0-beta.3",
-    "pinia": "^3.0.4"
+    "vuetify-nuxt-module": "^1.0.0-beta.3"
   },
   "devDependencies": {
-    "@nuxt/fonts": "^0.14.0",
-    "sass": "^1.98.0",
-    "eslint": "^9.39.4",
     "@nuxt/eslint": "^1.15.2",
-    "eslint-config-vuetify": "^4.3.4",
+    "@nuxt/fonts": "^0.14.0",
     "@pinia/nuxt": "^0.11.3",
-    "@vuetify/mcp": "^0.5.0"
+    "@vuetify/mcp": "^0.5.0",
+    "eslint": "^9.39.4",
+    "eslint-config-vuetify": "^4.3.4",
+    "openapi-typescript": "^7.13.0",
+    "sass": "^1.98.0",
+    "typescript": "^5.9.0",
+    "vue-tsc": "^3.2.0"
   }
 }

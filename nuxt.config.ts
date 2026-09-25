@@ -6,6 +6,19 @@ export default defineNuxtConfig({
   // ssr: false,
   modules: ['@nuxt/fonts', 'vuetify-nuxt-module', '@nuxt/eslint', '@pinia/nuxt'],
 
+  typescript: {
+    strict: true,
+    typeCheck: false,
+  },
+
+  runtimeConfig: {
+    public: {
+      // Overridable via NUXT_PUBLIC_API_BASE. bacakarya-api serves everything
+      // under /api (see openapi.yaml `servers`).
+      apiBase: 'http://localhost:8080/api',
+    },
+  },
+
   app: {
     head: {
       link: [
