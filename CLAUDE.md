@@ -138,7 +138,59 @@ api-reference/
   `/` when unauthenticated (no live backend available to test the
   authenticated path in this environment - test against a real
   `bacakarya-api` instance before considering this fully done).
-  Write/edit (multipart upload) is next.
+- **Phase 1 (write/edit) — done.** `components/TiptapEditor.vue` (Tiptap v3,
+  the Vue-3-native successor to the old app's vue-tiptap - bold/italic/
+  lists/blockquote toolbar), `utils/buildWorkFormData.ts` (multipart
+  FormData builder matching the documented repeated-`category`-field
+  encoding), `works.create`/`works.update` actions, and two pages:
+  `write.vue` (title/category/cover/attachment/text, client-side size
+  validation matching the backend's 2MB/10MB limits before even
+  attempting upload) and `work/[id]/edit.vue` (pre-filled, optional
+  cover/attachment replacement, ownership check via `writer.id ===
+  auth.user.id`, delete action). `read.vue` now shows an Edit button to
+  the work's owner. Cover preview blob URLs are revoked on unmount - the
+  old app never did this.
+  Fixed the same "generated type marks it optional" issue as `id` for
+  `User.username`/`pen_name`/`work_list`/`read_list`/`like_list`/
+  `rate_list` and `Work.title`/`text`/`cover`/`category`/`readers`/
+  `like_by`/`rate_by` - none of these have a `required:` list in the
+  `User`/`Work` schemas (only the *Create* variants do), even though
+  they're always present on a real document. See `shared/types/index.ts`.
+  Verified: typecheck/lint/build clean, SSR boot test confirms `/write`
+  and `/work/:id/edit` redirect correctly when unauthenticated. Same
+  caveat as Phase 1 reading side: the authenticated path (actually
+  submitting a work, uploading files) needs testing against a real
+  `bacakarya-api` instance.
+- **Phase 2 — done.** `bookshelf.vue` (fetches the current user via
+  `GET /users/{id}`, not `GET /users?username=`, because only the former
+  nested-populates `like_list.writer` - needed for `WorkCard`), the public
+  profile page `user/[username].vue` (stats + a "Karya Tulis" grid; since
+  `GET /users?username=` populates `work_list` but *not* each item's own
+  `writer`, the page injects a minimal writer object built from the
+  profile itself rather than making `WorkCard` tolerate an unpopulated
+  writer everywhere else too), ownership-gated edit/delete buttons directly
+  on `WorkCard` (compares `work.writer.id` to the logged-in user), and a
+  real visual pass: a literary green/amber theme (light + dark, see
+  `nuxt.config.ts` `vuetifyOptions.theme`), 'Lora' for headings via
+  `@nuxt/fonts`, consistent rounded corners and outlined form fields via
+  `vuetifyOptions.defaults`, a proper two-column landing layout for
+  login/register, and a nav bar with an avatar menu instead of a bare
+  logout button.
+  **Known sandbox limitation, not a real bug**: this environment's network
+  egress blocks Google Fonts (403 Forbidden), so `@nuxt/fonts` can't
+  actually self-host 'Lora' here - the build still succeeds and falls back
+  to the plain serif stack, but I haven't been able to visually verify the
+  real font renders. Should just work in a normal environment with internet
+  access; check once actually deployed.
+  Verified: typecheck/lint/build clean, boot test confirms the new pages
+  render/redirect correctly.
+  Backend note worth knowing for future pages: `GET /users?username=`
+  (`findUsers`) populates `work_list`/`read_list`/`like_list` as full
+  `Work` objects but does NOT populate each item's own `writer`; only
+  `GET /users/{id}` (`findUserById`) does a nested populate, and even then
+  only for `read_list.readers` and `like_list.writer` - not `work_list`.
+  Keep this in mind before assuming any given endpoint's response is fully
+  populated three levels deep.
 - Note: `User`/`Work`'s generated `id` field is typed optional in the raw
   OpenAPI output (schema doesn't list it under `required`, even though it's
   always present on a persisted document) - `shared/types/index.ts`

@@ -67,6 +67,27 @@ export const useWorksStore = defineStore('works', () => {
     })
   }
 
+  async function create (formData: FormData) {
+    const api = useApi()
+    const res = await api<ApiEnvelope<PopulatedWork>>('/works', {
+      method: 'POST',
+      body: formData,
+    })
+    return res.data
+  }
+
+  async function update (id: string, formData: FormData) {
+    const api = useApi()
+    const res = await api<ApiEnvelope<PopulatedWork>>(`/works/${id}`, {
+      method: 'PUT',
+      body: formData,
+    })
+    if (current.value?.id === id) {
+      current.value = res.data
+    }
+    return res.data
+  }
+
   async function remove (id: string) {
     const api = useApi()
     await api(`/works/${id}`, { method: 'DELETE' })
@@ -81,6 +102,8 @@ export const useWorksStore = defineStore('works', () => {
     like,
     unlike,
     rate,
+    create,
+    update,
     remove,
   }
 })

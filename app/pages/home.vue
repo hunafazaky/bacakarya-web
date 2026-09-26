@@ -11,7 +11,7 @@
           md="3"
           sm="4"
         >
-          <WorkCard :work="work" />
+          <WorkCard :work="work" @delete="onDeleteRecommendation" />
         </v-col>
       </v-row>
     </template>
@@ -31,7 +31,7 @@
           md="3"
           sm="4"
         >
-          <WorkCard :work="work" />
+          <WorkCard :work="work" @delete="deleteWork" />
         </v-col>
       </template>
 
@@ -53,7 +53,7 @@
 
   const auth = useAuthStore()
   const worksStore = useWorksStore()
-  const { works, loading } = useWorkList()
+  const { works, loading, deleteWork } = useWorkList()
 
   const recommendations = ref<PopulatedWork[]>([])
   onMounted(async () => {
@@ -62,4 +62,9 @@
       recommendations.value = await worksStore.fetchRecommendations(user.id)
     }
   })
+
+  async function onDeleteRecommendation (id: string) {
+    await worksStore.remove(id)
+    recommendations.value = recommendations.value.filter(w => w.id !== id)
+  }
 </script>

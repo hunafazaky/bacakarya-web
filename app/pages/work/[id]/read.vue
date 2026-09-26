@@ -58,6 +58,17 @@
             {{ isLiked ? 'Buang dari simpanan' : 'Simpan' }}
           </v-btn>
 
+          <v-btn
+            v-if="isOwner"
+            block
+            class="mb-3"
+            :to="`/work/${workId}/edit`"
+            variant="tonal"
+          >
+            <v-icon start>mdi-pencil</v-icon>
+            Edit
+          </v-btn>
+
           <div>
             <p class="text-caption font-weight-bold mb-0">Beri rating</p>
 
@@ -94,6 +105,8 @@
     const user = auth.user
     return !!user && !!work.value?.like_by?.includes(user.id)
   })
+
+  const isOwner = computed(() => auth.user?.id === work.value?.writer.id)
 
   const rating = ref(
     auth.user?.rate_list?.find(r => r.work_id === workId)?.rating ?? 0,

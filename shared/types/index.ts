@@ -4,9 +4,35 @@
 // via `npm run gen:types`, not edited by hand.
 import type { components } from './api'
 
-export type User = Omit<components['schemas']['User'], 'id'> & { id: string }
+// The generated types mark nearly every property optional, since the
+// OpenAPI schemas don't list a `required` array for User/Work at all (only
+// their *Create*Request/Form variants do). In practice every field below is
+// always present on a persisted document - redeclare them as required here
+// once, rather than scattering `?.`/`!` through every page.
+export type User = Omit<components['schemas']['User'],
+  'id' | 'username' | 'pen_name' | 'work_list' | 'read_list' | 'like_list' | 'rate_list'
+> & {
+  id: string
+  username: string
+  pen_name: string
+  work_list: string[]
+  read_list: string[]
+  like_list: string[]
+  rate_list: components['schemas']['UserRating'][]
+}
 export type UserRating = components['schemas']['UserRating']
-export type Work = Omit<components['schemas']['Work'], 'id'> & { id: string }
+export type Work = Omit<components['schemas']['Work'],
+  'id' | 'title' | 'text' | 'cover' | 'category' | 'readers' | 'like_by' | 'rate_by'
+> & {
+  id: string
+  title: string
+  text: string
+  cover: string
+  category: string[]
+  readers: string[]
+  like_by: string[]
+  rate_by: components['schemas']['WorkRating'][]
+}
 export type WorkRating = components['schemas']['WorkRating']
 export type Attachment = components['schemas']['Attachment']
 export type PaginationMeta = components['schemas']['PaginationMeta']

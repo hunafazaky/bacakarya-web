@@ -1,43 +1,55 @@
 <template>
-  <v-row class="mt-10" justify="center">
-    <v-col cols="12" md="4" sm="8">
-      <v-card>
-        <v-card-title>{{ mode === 'login' ? 'Masuk' : 'Daftar' }}</v-card-title>
+  <v-container class="fill-height" fluid>
+    <v-row align="center" class="fill-height" justify="center">
+      <v-col class="d-none d-md-flex flex-column justify-center pr-md-10" cols="12" md="5">
+        <h1 class="brand-hero mb-4">Bacakarya</h1>
 
-        <v-card-text>
-          <v-form @submit.prevent="submit">
-            <v-text-field v-model="form.username" label="Username" required />
+        <p class="text-h6 font-weight-regular text-medium-emphasis">
+          Tempat menulis, membaca, dan menemukan karya tulis baru.
+        </p>
+      </v-col>
 
-            <v-text-field
-              v-if="mode === 'register'"
-              v-model="form.pen_name"
-              label="Nama Pena"
-              required
-            />
+      <v-col cols="12" md="4" sm="8">
+        <h1 class="brand-hero mb-6 d-md-none text-center">Bacakarya</h1>
 
-            <v-text-field
-              v-model="form.password"
-              label="Password"
-              required
-              type="password"
-            />
+        <v-card>
+          <v-card-title>{{ mode === 'login' ? 'Masuk' : 'Daftar' }}</v-card-title>
 
-            <v-alert v-if="error" class="mb-4" density="compact" type="error">
-              {{ error }}
-            </v-alert>
+          <v-card-text>
+            <v-form @submit.prevent="submit">
+              <v-text-field v-model="form.username" label="Username" required />
 
-            <v-btn block color="primary" :loading="loading" type="submit">
-              {{ mode === 'login' ? 'Masuk' : 'Daftar' }}
+              <v-text-field
+                v-if="mode === 'register'"
+                v-model="form.pen_name"
+                label="Nama Pena"
+                required
+              />
+
+              <v-text-field
+                v-model="form.password"
+                label="Password"
+                required
+                type="password"
+              />
+
+              <v-alert v-if="error" class="mb-4" density="compact" type="error">
+                {{ error }}
+              </v-alert>
+
+              <v-btn block color="primary" :loading="loading" type="submit">
+                {{ mode === 'login' ? 'Masuk' : 'Daftar' }}
+              </v-btn>
+            </v-form>
+
+            <v-btn block class="mt-2" variant="text" @click="toggleMode">
+              {{ mode === 'login' ? 'Belum punya akun? Daftar' : 'Sudah punya akun? Masuk' }}
             </v-btn>
-          </v-form>
-
-          <v-btn block class="mt-2" variant="text" @click="toggleMode">
-            {{ mode === 'login' ? 'Belum punya akun? Daftar' : 'Sudah punya akun? Masuk' }}
-          </v-btn>
-        </v-card-text>
-      </v-card>
-    </v-col>
-  </v-row>
+          </v-card-text>
+        </v-card>
+      </v-col>
+    </v-row>
+  </v-container>
 </template>
 
 <script setup lang="ts">
@@ -72,3 +84,11 @@
     }
   }
 </script>
+
+<style scoped>
+.brand-hero {
+  font-family: 'Lora', serif;
+  font-weight: 600;
+  font-size: 3rem;
+}
+</style>

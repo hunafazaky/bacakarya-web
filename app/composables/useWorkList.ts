@@ -44,6 +44,12 @@ export function useWorkList (getCategory?: () => string | undefined) {
     }
   }
 
+  async function deleteWork (id: string) {
+    await worksStore.remove(id)
+    works.value = works.value.filter(w => w.id !== id)
+    total.value = Math.max(0, total.value - 1)
+  }
+
   onMounted(() => {
     fetchWorks()
     window.addEventListener('scroll', handleScroll)
@@ -52,5 +58,5 @@ export function useWorkList (getCategory?: () => string | undefined) {
     window.removeEventListener('scroll', handleScroll)
   })
 
-  return { works, total, loading, reset }
+  return { works, total, loading, reset, deleteWork }
 }

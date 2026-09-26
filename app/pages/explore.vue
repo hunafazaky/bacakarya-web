@@ -25,7 +25,7 @@
           md="3"
           sm="4"
         >
-          <WorkCard :work="work" />
+          <WorkCard :work="work" @delete="deleteWork" />
         </v-col>
       </template>
 
@@ -44,7 +44,7 @@
   definePageMeta({ middleware: 'auth' })
 
   const selectedCategory = ref<string | undefined>(undefined)
-  const { works, loading, reset } = useWorkList(() => selectedCategory.value)
+  const { works, loading, reset, deleteWork } = useWorkList(() => selectedCategory.value)
 
   function onCategoryChange () {
     reset()

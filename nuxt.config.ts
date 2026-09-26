@@ -27,6 +27,12 @@ export default defineNuxtConfig({
     },
   },
 
+  fonts: {
+    families: [
+      { name: 'Lora', provider: 'google' },
+    ],
+  },
+
   vuetify: {
     moduleOptions: {
       prefixComposables: ['useLayout'],
@@ -49,9 +55,32 @@ export default defineNuxtConfig({
         defaultTheme: 'dark',
 
         themes: {
-          light: {},
-          dark: {},
+          // A warm, literary palette - deep forest green + amber accent,
+          // rather than Vuetify's default indigo demo colors.
+          light: {
+            colors: {
+              primary: '#2F6F4E',
+              secondary: '#B08A3E',
+              background: '#FBF9F4',
+              surface: '#FFFFFF',
+            },
+          },
+          dark: {
+            colors: {
+              primary: '#4C9A73',
+              secondary: '#D4AF6A',
+              background: '#14181B',
+              surface: '#1D2226',
+            },
+          },
         },
+      },
+      defaults: {
+        VCard: { rounded: 'lg' },
+        VBtn: { rounded: 'lg' },
+        VTextField: { variant: 'outlined', density: 'comfortable' },
+        VSelect: { variant: 'outlined', density: 'comfortable' },
+        VFileInput: { variant: 'outlined', density: 'comfortable' },
       },
     },
   },
