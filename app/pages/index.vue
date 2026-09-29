@@ -1,7 +1,13 @@
 <template>
   <v-container class="fill-height" fluid>
+    <ThemeToggle class="theme-toggle-floating" />
+
     <v-row align="center" class="fill-height" justify="center">
-      <v-col class="d-none d-md-flex flex-column justify-center pr-md-10" cols="12" md="5">
+      <v-col
+        class="d-none d-md-flex flex-column justify-center pr-md-10"
+        cols="12"
+        md="5"
+      >
         <h1 class="brand-hero mb-4">Bacakarya</h1>
 
         <p class="text-h6 font-weight-regular text-medium-emphasis">
@@ -13,7 +19,9 @@
         <h1 class="brand-hero mb-6 d-md-none text-center">Bacakarya</h1>
 
         <v-card>
-          <v-card-title>{{ mode === 'login' ? 'Masuk' : 'Daftar' }}</v-card-title>
+          <v-card-title>{{
+            mode === 'login' ? 'Masuk' : 'Daftar'
+          }}</v-card-title>
 
           <v-card-text>
             <v-form @submit.prevent="submit">
@@ -43,7 +51,11 @@
             </v-form>
 
             <v-btn block class="mt-2" variant="text" @click="toggleMode">
-              {{ mode === 'login' ? 'Belum punya akun? Daftar' : 'Sudah punya akun? Masuk' }}
+              {{
+                mode === 'login'
+                  ? 'Belum punya akun? Daftar'
+                  : 'Sudah punya akun? Masuk'
+              }}
             </v-btn>
           </v-card-text>
         </v-card>
@@ -53,36 +65,41 @@
 </template>
 
 <script setup lang="ts">
-  const auth = useAuthStore()
-  const mode = ref<'login' | 'register'>('login')
-  const loading = ref(false)
-  const error = ref('')
-  const form = reactive({ username: '', pen_name: '', password: '' })
+const auth = useAuthStore()
+if (auth.isLoggedIn) {
+  await navigateTo('/home')
+}
 
-  function toggleMode () {
-    mode.value = mode.value === 'login' ? 'register' : 'login'
-    error.value = ''
-  }
+const mode = ref<'login' | 'register'>('login')
+const loading = ref(false)
+const error = ref('')
+const form = reactive({ username: '', pen_name: '', password: '' })
 
-  async function submit () {
-    loading.value = true
-    error.value = ''
-    try {
-      if (mode.value === 'register') {
-        await auth.register({
-          username: form.username,
-          pen_name: form.pen_name,
-          password: form.password,
-        })
-      }
-      await auth.login({ username: form.username, password: form.password })
-      await navigateTo('/home')
-    } catch (error_: any) {
-      error.value = error_?.statusMessage || error_?.message || 'Terjadi kesalahan'
-    } finally {
-      loading.value = false
+function toggleMode() {
+  mode.value = mode.value === 'login' ? 'register' : 'login'
+  error.value = ''
+}
+
+async function submit() {
+  loading.value = true
+  error.value = ''
+  try {
+    if (mode.value === 'register') {
+      await auth.register({
+        username: form.username,
+        pen_name: form.pen_name,
+        password: form.password,
+      })
     }
+    await auth.login({ username: form.username, password: form.password })
+    await navigateTo('/home')
+  } catch (error_: any) {
+    error.value =
+      error_?.statusMessage || error_?.message || 'Terjadi kesalahan'
+  } finally {
+    loading.value = false
   }
+}
 </script>
 
 <style scoped>
@@ -90,5 +107,10 @@
   font-family: 'Lora', serif;
   font-weight: 600;
   font-size: 3rem;
+}
+.theme-toggle-floating {
+  position: absolute;
+  top: 16px;
+  right: 16px;
 }
 </style>

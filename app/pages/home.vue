@@ -19,18 +19,16 @@
     <p class="text-overline text-medium-emphasis mb-2">Paling Baru</p>
 
     <v-row>
-      <v-col v-if="loading && works.length === 0" class="text-center py-10" cols="12">
+      <v-col
+        v-if="loading && works.length === 0"
+        class="text-center py-10"
+        cols="12"
+      >
         <v-progress-circular color="primary" indeterminate />
       </v-col>
 
       <template v-else-if="works.length > 0">
-        <v-col
-          v-for="work in works"
-          :key="work.id"
-          cols="6"
-          md="3"
-          sm="4"
-        >
+        <v-col v-for="work in works" :key="work.id" cols="6" md="3" sm="4">
           <WorkCard :work="work" @delete="deleteWork" />
         </v-col>
       </template>
@@ -47,24 +45,24 @@
 </template>
 
 <script setup lang="ts">
-  import type { PopulatedWork } from '~~/shared/types'
+import type { PopulatedWork } from '~~/shared/types'
 
-  definePageMeta({ middleware: 'auth' })
+definePageMeta({ middleware: 'auth' })
 
-  const auth = useAuthStore()
-  const worksStore = useWorksStore()
-  const { works, loading, deleteWork } = useWorkList()
+const auth = useAuthStore()
+const worksStore = useWorksStore()
+const { works, loading, deleteWork } = useWorkList()
 
-  const recommendations = ref<PopulatedWork[]>([])
-  onMounted(async () => {
-    const user = auth.user
-    if (user) {
-      recommendations.value = await worksStore.fetchRecommendations(user.id)
-    }
-  })
-
-  async function onDeleteRecommendation (id: string) {
-    await worksStore.remove(id)
-    recommendations.value = recommendations.value.filter(w => w.id !== id)
+const recommendations = ref<PopulatedWork[]>([])
+onMounted(async () => {
+  const user = auth.user
+  if (user) {
+    recommendations.value = await worksStore.fetchRecommendations(user.id)
   }
+})
+
+async function onDeleteRecommendation(id: string) {
+  await worksStore.remove(id)
+  recommendations.value = recommendations.value.filter((w) => w.id !== id)
+}
 </script>

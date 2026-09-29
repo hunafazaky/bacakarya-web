@@ -4,7 +4,12 @@ export default defineNuxtConfig({
   devtools: { enabled: true },
 
   // ssr: false,
-  modules: ['@nuxt/fonts', 'vuetify-nuxt-module', '@nuxt/eslint', '@pinia/nuxt'],
+  modules: [
+    '@nuxt/fonts',
+    'vuetify-nuxt-module',
+    '@nuxt/eslint',
+    '@pinia/nuxt',
+  ],
 
   typescript: {
     strict: true,
@@ -21,16 +26,12 @@ export default defineNuxtConfig({
 
   app: {
     head: {
-      link: [
-        { rel: 'stylesheet', href: '/layers.css' },
-      ],
+      link: [{ rel: 'stylesheet', href: '/layers.css' }],
     },
   },
 
   fonts: {
-    families: [
-      { name: 'Lora', provider: 'google' },
-    ],
+    families: [{ name: 'Lora', provider: 'google' }],
   },
 
   vuetify: {

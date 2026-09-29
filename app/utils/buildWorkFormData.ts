@@ -7,7 +7,7 @@ export interface WorkFormInput {
   attachmentTitle?: string
 }
 
-export function buildWorkFormData (input: WorkFormInput): FormData {
+export function buildWorkFormData(input: WorkFormInput): FormData {
   const form = new FormData()
   form.append('title', input.title)
   form.append('text', input.text)

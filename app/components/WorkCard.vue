@@ -1,9 +1,21 @@
 <template>
-  <v-card class="work-card" elevation="1" height="100%" :to="`/work/${work.id}/read`">
+  <v-card
+    class="work-card"
+    :disabled="!work.id"
+    elevation="1"
+    height="100%"
+    :to="work.id ? `/work/${work.id}/read` : undefined"
+  >
     <div class="cover-wrap">
-      <v-img cover height="160" :src="work.cover" />
+      <AppImage
+        cover
+        height="160"
+        size="400x600"
+        :src="work.cover"
+        :text="work.title"
+      />
 
-      <div v-if="isOwner" class="owner-actions" @click.stop.prevent>
+      <div v-if="isOwner && work.id" class="owner-actions" @click.stop.prevent>
         <v-btn
           color="surface"
           icon="mdi-pencil"
@@ -40,20 +52,22 @@
 </template>
 
 <script setup lang="ts">
-  import type { PopulatedWork } from '~~/shared/types'
+import type { PopulatedWork } from '~~/shared/types'
 
-  const props = defineProps<{
-    work: PopulatedWork
-  }>()
-  defineEmits<{ delete: [id: string] }>()
+const props = defineProps<{
+  work: PopulatedWork
+}>()
+defineEmits<{ delete: [id: string] }>()
 
-  const auth = useAuthStore()
-  const isOwner = computed(() => auth.user?.id === props.work.writer.id)
+const auth = useAuthStore()
+const isOwner = computed(() => auth.user?.id === props.work.writer.id)
 </script>
 
 <style scoped>
 .work-card {
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease;
 }
 .work-card:hover {
   transform: translateY(-2px);

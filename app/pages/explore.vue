@@ -13,18 +13,16 @@
     </v-chip-group>
 
     <v-row>
-      <v-col v-if="loading && works.length === 0" class="text-center py-10" cols="12">
+      <v-col
+        v-if="loading && works.length === 0"
+        class="text-center py-10"
+        cols="12"
+      >
         <v-progress-circular color="primary" indeterminate />
       </v-col>
 
       <template v-else-if="works.length > 0">
-        <v-col
-          v-for="work in works"
-          :key="work.id"
-          cols="6"
-          md="3"
-          sm="4"
-        >
+        <v-col v-for="work in works" :key="work.id" cols="6" md="3" sm="4">
           <WorkCard :work="work" @delete="deleteWork" />
         </v-col>
       </template>
@@ -41,12 +39,14 @@
 </template>
 
 <script setup lang="ts">
-  definePageMeta({ middleware: 'auth' })
+definePageMeta({ middleware: 'auth' })
 
-  const selectedCategory = ref<string | undefined>(undefined)
-  const { works, loading, reset, deleteWork } = useWorkList(() => selectedCategory.value)
+const selectedCategory = ref<string | undefined>(undefined)
+const { works, loading, reset, deleteWork } = useWorkList(
+  () => selectedCategory.value
+)
 
-  function onCategoryChange () {
-    reset()
-  }
+function onCategoryChange() {
+  reset()
+}
 </script>

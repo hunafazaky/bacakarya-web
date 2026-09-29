@@ -8,6 +8,18 @@ info:
 
     All success responses share the shape `{ data, message, meta? }` and
     all error responses share `{ data: null, message }`.
+
+
+    **Populated vs. raw documents.** Relationship fields (`Work.writer`,
+    `Work.readers`, `Work.like_by`, and `User.work_list`/`read_list`/
+    `like_list`) are ids in a raw document but are replaced with the full
+    referenced documents by most read endpoints. Which endpoint returns
+    which is documented per operation, and modeled as separate schemas:
+    `Work` / `PopulatedWork` (plus the two partial variants
+    `WorkWithReaders` / `WorkWithWriter`) and `User` / `UserWithWorks` /
+    `UserDetail`. Populating is one level deep unless a schema says
+    otherwise - e.g. the `User` embedded in `PopulatedWork.writer` has its
+    own `work_list` etc. as plain ids.
   version: 1.7.1
 servers:
   - url: /api
@@ -52,6 +64,10 @@ paths:
     get:
       tags: [Users]
       summary: List users
+      description: >
+        Each user's `work_list`, `read_list` and `like_list` are populated
+        with full Work objects (see `UserWithWorks`). Those nested works
+        are raw: their own `writer`/`readers`/`like_by` are ids.
       security: []
       parameters:
         - in: query
@@ -81,6 +97,9 @@ paths:
     post:
       tags: [Users]
       summary: Log in
+      description: >
+        The returned `user` has `work_list`, `read_list` and `like_list`
+        populated with full Work objects (see `UserWithWorks`).
       security: []
       requestBody:
         required: true
@@ -108,6 +127,12 @@ paths:
     get:
       tags: [Users]
       summary: Get a user by id
+      description: >
+        `work_list`, `read_list` and `like_list` are populated with full
+        Work objects. Unlike `GET /users` and `POST /users/login`, this
+        endpoint also populates one level deeper: each `read_list` work
+        has its `readers` populated, and each `like_list` work has its
+        `writer` populated (see `UserDetail`). `work_list` items are raw.
       security: []
       responses:
         '200':
@@ -115,7 +140,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UserResponse'
+                $ref: '#/components/schemas/UserDetailResponse'
         '404':
           $ref: '#/components/responses/NotFound'
     put:
@@ -132,11 +157,11 @@ paths:
               $ref: '#/components/schemas/UserUpdateRequest'
       responses:
         '200':
-          description: Updated user
+          description: Updated user, with its lists populated (see `UserWithWorks`)
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UserResponse'
+                $ref: '#/components/schemas/UserWithWorksResponse'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '403':
@@ -192,7 +217,10 @@ paths:
                 explode: true
       responses:
         '201':
-          description: Created work
+          description: >
+            Created work, as a raw (unpopulated) document: `writer` is a
+            user id and `readers`/`like_by` are empty. Fetch
+            `GET /works/{id}` for the populated version.
           content:
             application/json:
               schema:
@@ -214,6 +242,9 @@ paths:
     get:
       tags: [Works]
       summary: List works (paginated)
+      description: >
+        Each work has `writer`, `readers` and `like_by` populated with
+        full User objects (see `PopulatedWork`).
       security: []
       parameters:
         - in: query
@@ -241,7 +272,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/WorkListResponse'
+                $ref: '#/components/schemas/PopulatedWorkListResponse'
     delete:
       tags: [Works]
       summary: Delete all works
@@ -276,7 +307,7 @@ paths:
                     $ref: '#/components/schemas/WorkCreateRequest'
       responses:
         '201':
-          description: Created works
+          description: Created works, as raw (unpopulated) documents
           content:
             application/json:
               schema:
@@ -292,6 +323,9 @@ paths:
     get:
       tags: [Works]
       summary: Get a work by id
+      description: >
+        `writer`, `readers` and `like_by` are populated with full User
+        objects (see `PopulatedWork`).
       security: []
       responses:
         '200':
@@ -299,7 +333,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/WorkResponse'
+                $ref: '#/components/schemas/PopulatedWorkResponse'
         '404':
           $ref: '#/components/responses/NotFound'
     put:
@@ -334,7 +368,9 @@ paths:
                 explode: true
       responses:
         '200':
-          description: Updated work
+          description: >
+            Updated work, as a raw (unpopulated) document: `writer`,
+            `readers` and `like_by` are ids here, unlike `GET /works/{id}`.
           content:
             application/json:
               schema:
@@ -388,11 +424,11 @@ paths:
         - bearerAuth: []
       responses:
         '200':
-          description: Updated work
+          description: Updated work, populated (see `PopulatedWork`)
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/WorkResponse'
+                $ref: '#/components/schemas/PopulatedWorkResponse'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -411,11 +447,11 @@ paths:
         - bearerAuth: []
       responses:
         '200':
-          description: Updated work
+          description: Updated work, populated (see `PopulatedWork`)
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/WorkResponse'
+                $ref: '#/components/schemas/PopulatedWorkResponse'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -430,11 +466,11 @@ paths:
         - bearerAuth: []
       responses:
         '200':
-          description: Updated work
+          description: Updated work, populated (see `PopulatedWork`)
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/WorkResponse'
+                $ref: '#/components/schemas/PopulatedWorkResponse'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -581,7 +617,10 @@ paths:
     get:
       tags: [Recommendations]
       summary: Get recommended works for a user
-      description: '`id` is a user id. Requires the token to belong to this user.'
+      description: >
+        `id` is a user id. Requires the token to belong to this user.
+        Each work has `writer`, `readers` and `like_by` populated (see
+        `PopulatedWork`).
       security:
         - bearerAuth: []
       responses:
@@ -590,7 +629,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/WorkListDataResponse'
+                $ref: '#/components/schemas/PopulatedWorkListResponse'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '403':
@@ -724,7 +763,7 @@ components:
       type: object
       properties:
         user:
-          $ref: '#/components/schemas/User'
+          $ref: '#/components/schemas/UserWithWorks'
         token:
           type: string
           description: 'JWT, valid for 7 days. Send as `Authorization: Bearer <token>`.'
@@ -747,7 +786,8 @@ components:
           type: string
           format: uri
 
-    User:
+    UserBase:
+      description: Fields common to every User variant (everything except the three work lists).
       type: object
       properties:
         id:
@@ -759,19 +799,6 @@ components:
         photo:
           type: string
           format: uri
-        work_list:
-          type: array
-          items:
-            type: string
-          description: Work ids (or populated Work objects, depending on the endpoint)
-        read_list:
-          type: array
-          items:
-            type: string
-        like_list:
-          type: array
-          items:
-            type: string
         rate_list:
           type: array
           items:
@@ -782,6 +809,75 @@ components:
         updatedAt:
           type: string
           format: date-time
+
+    User:
+      description: >
+        A raw user: `work_list`, `read_list` and `like_list` are plain
+        work ids. Returned by `POST /users`, and is the shape of a User
+        populated into another document (e.g. `PopulatedWork.writer`).
+      allOf:
+        - $ref: '#/components/schemas/UserBase'
+        - type: object
+          properties:
+            work_list:
+              type: array
+              items:
+                type: string
+              description: Ids of the works this user wrote
+            read_list:
+              type: array
+              items:
+                type: string
+              description: Ids of the works this user has read
+            like_list:
+              type: array
+              items:
+                type: string
+              description: Ids of the works this user has liked
+
+    UserWithWorks:
+      description: >
+        A user with all three lists populated with full (raw) Work
+        objects. Returned by `GET /users`, `PUT /users/{id}` and
+        `POST /users/login`.
+      allOf:
+        - $ref: '#/components/schemas/UserBase'
+        - type: object
+          properties:
+            work_list:
+              type: array
+              items:
+                $ref: '#/components/schemas/Work'
+            read_list:
+              type: array
+              items:
+                $ref: '#/components/schemas/Work'
+            like_list:
+              type: array
+              items:
+                $ref: '#/components/schemas/Work'
+
+    UserDetail:
+      description: >
+        Returned by `GET /users/{id}` only. Like `UserWithWorks`, plus one
+        extra level of population: each `read_list` work has its `readers`
+        populated, and each `like_list` work has its `writer` populated.
+      allOf:
+        - $ref: '#/components/schemas/UserBase'
+        - type: object
+          properties:
+            work_list:
+              type: array
+              items:
+                $ref: '#/components/schemas/Work'
+            read_list:
+              type: array
+              items:
+                $ref: '#/components/schemas/WorkWithReaders'
+            like_list:
+              type: array
+              items:
+                $ref: '#/components/schemas/WorkWithWriter'
 
     UserRating:
       type: object
@@ -800,13 +896,31 @@ components:
           type: string
           nullable: true
 
+    UserWithWorksResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/UserWithWorks'
+        message:
+          type: string
+          nullable: true
+
+    UserDetailResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/UserDetail'
+        message:
+          type: string
+          nullable: true
+
     UserListResponse:
       type: object
       properties:
         data:
           type: array
           items:
-            $ref: '#/components/schemas/User'
+            $ref: '#/components/schemas/UserWithWorks'
         message:
           type: string
           nullable: true
@@ -904,7 +1018,8 @@ components:
           type: string
           format: uri
 
-    Work:
+    WorkBase:
+      description: Fields common to every Work variant (everything except writer, readers and like_by).
       type: object
       properties:
         id:
@@ -916,17 +1031,6 @@ components:
           format: uri
         attachment:
           $ref: '#/components/schemas/Attachment'
-        writer:
-          type: string
-          description: User id (or a populated User object, depending on the endpoint)
-        readers:
-          type: array
-          items:
-            type: string
-        like_by:
-          type: array
-          items:
-            type: string
         rate_by:
           type: array
           items:
@@ -943,6 +1047,87 @@ components:
         updatedAt:
           type: string
           format: date-time
+
+    Work:
+      description: >
+        A raw work: `writer`, `readers` and `like_by` are plain user ids.
+        Returned by `POST /works`, `POST /works/many` and `PUT /works/{id}`,
+        and is the shape of a Work populated into a User's lists.
+      allOf:
+        - $ref: '#/components/schemas/WorkBase'
+        - type: object
+          properties:
+            writer:
+              type: string
+              description: Id of the user who wrote this work
+            readers:
+              type: array
+              items:
+                type: string
+              description: Ids of users who have read this work
+            like_by:
+              type: array
+              items:
+                type: string
+              description: Ids of users who have liked this work
+
+    PopulatedWork:
+      description: >
+        A work with `writer`, `readers` and `like_by` populated with full
+        (raw) User objects. Returned by `GET /works`, `GET /works/{id}`,
+        `GET /recommendations/{id}`, and the read/like/unlike endpoints.
+      allOf:
+        - $ref: '#/components/schemas/WorkBase'
+        - type: object
+          properties:
+            writer:
+              $ref: '#/components/schemas/User'
+            readers:
+              type: array
+              items:
+                $ref: '#/components/schemas/User'
+            like_by:
+              type: array
+              items:
+                $ref: '#/components/schemas/User'
+
+    WorkWithReaders:
+      description: >
+        A work with only `readers` populated (`writer` and `like_by` stay
+        ids). Appears as an item of `UserDetail.read_list`.
+      allOf:
+        - $ref: '#/components/schemas/WorkBase'
+        - type: object
+          properties:
+            writer:
+              type: string
+            readers:
+              type: array
+              items:
+                $ref: '#/components/schemas/User'
+            like_by:
+              type: array
+              items:
+                type: string
+
+    WorkWithWriter:
+      description: >
+        A work with only `writer` populated (`readers` and `like_by` stay
+        ids). Appears as an item of `UserDetail.like_list`.
+      allOf:
+        - $ref: '#/components/schemas/WorkBase'
+        - type: object
+          properties:
+            writer:
+              $ref: '#/components/schemas/User'
+            readers:
+              type: array
+              items:
+                type: string
+            like_by:
+              type: array
+              items:
+                type: string
 
     WorkRating:
       type: object
@@ -961,30 +1146,42 @@ components:
           type: string
           nullable: true
 
+    PopulatedWorkResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/PopulatedWork'
+        message:
+          type: string
+          nullable: true
+
     WorkListResponse:
+      description: A list of raw works, with no pagination meta (e.g. the result of POST /works/many).
       type: object
       properties:
         data:
           type: array
           items:
             $ref: '#/components/schemas/Work'
+        message:
+          type: string
+          nullable: true
+
+    PopulatedWorkListResponse:
+      description: >
+        A list of populated works. `meta` is present only on the paginated
+        `GET /works`, not on `GET /recommendations/{id}`.
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/PopulatedWork'
         message:
           type: string
           nullable: true
         meta:
           $ref: '#/components/schemas/PaginationMeta'
-
-    WorkListDataResponse:
-      description: Like WorkListResponse but without pagination meta (e.g. a recommendation list).
-      type: object
-      properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/Work'
-        message:
-          type: string
-          nullable: true
 
     # --- Classification ---
     Classification:

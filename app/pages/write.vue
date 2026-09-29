@@ -73,66 +73,70 @@
 </template>
 
 <script setup lang="ts">
-  definePageMeta({ middleware: 'auth' })
+definePageMeta({ middleware: 'auth' })
 
-  const worksStore = useWorksStore()
+const worksStore = useWorksStore()
 
-  const form = reactive({
-    title: '',
-    text: '',
-    category: [] as string[],
-  })
-  const coverFile = ref<File | null>(null)
-  const attachmentFile = ref<File | null>(null)
-  const attachmentTitle = ref('')
-  const submitting = ref(false)
-  const error = ref('')
+const form = reactive({
+  title: '',
+  text: '',
+  category: [] as string[],
+})
+const coverFile = ref<File | null>(null)
+const attachmentFile = ref<File | null>(null)
+const attachmentTitle = ref('')
+const submitting = ref(false)
+const error = ref('')
 
-  const coverPreview = computed(() =>
-    coverFile.value ? URL.createObjectURL(coverFile.value) : null,
-  )
-  onBeforeUnmount(() => {
-    if (coverPreview.value) URL.revokeObjectURL(coverPreview.value)
-  })
+const coverPreview = computed(() =>
+  coverFile.value ? URL.createObjectURL(coverFile.value) : null
+)
+onBeforeUnmount(() => {
+  if (coverPreview.value) URL.revokeObjectURL(coverPreview.value)
+})
 
-  function coverRule (file: File | File[] | null | undefined) {
-    const f = Array.isArray(file) ? file[0] : file
-    if (f && f.size > COVER_MAX_BYTES) return 'Ukuran cover maksimal 2MB'
-    return true
+function coverRule(file: File | File[] | null | undefined) {
+  const f = Array.isArray(file) ? file[0] : file
+  if (f && f.size > COVER_MAX_BYTES) return 'Ukuran cover maksimal 2MB'
+  return true
+}
+function attachmentRule(file: File | File[] | null | undefined) {
+  const f = Array.isArray(file) ? file[0] : file
+  if (f && f.size > ATTACHMENT_MAX_BYTES) return 'Ukuran lampiran maksimal 10MB'
+  return true
+}
+
+const canSubmit = computed(
+  () =>
+    !!form.title &&
+    !!form.text &&
+    !!coverFile.value &&
+    coverFile.value.size <= COVER_MAX_BYTES &&
+    (!attachmentFile.value || attachmentFile.value.size <= ATTACHMENT_MAX_BYTES)
+)
+
+async function submit() {
+  if (!canSubmit.value) return
+  submitting.value = true
+  error.value = ''
+  try {
+    const formData = buildWorkFormData({
+      title: form.title,
+      text: form.text,
+      category: form.category,
+      coverFile: coverFile.value,
+      attachmentFile: attachmentFile.value,
+      attachmentTitle: attachmentTitle.value,
+    })
+    const work = await worksStore.create(formData)
+    await navigateTo(`/work/${work.id}/read`)
+  } catch (error_: any) {
+    error.value =
+      error_?.statusMessage ||
+      error_?.message ||
+      'Gagal menerbitkan karya tulis'
+  } finally {
+    submitting.value = false
   }
-  function attachmentRule (file: File | File[] | null | undefined) {
-    const f = Array.isArray(file) ? file[0] : file
-    if (f && f.size > ATTACHMENT_MAX_BYTES) return 'Ukuran lampiran maksimal 10MB'
-    return true
-  }
-
-  const canSubmit = computed(() =>
-    !!form.title
-    && !!form.text
-    && !!coverFile.value
-    && coverFile.value.size <= COVER_MAX_BYTES
-    && (!attachmentFile.value || attachmentFile.value.size <= ATTACHMENT_MAX_BYTES),
-  )
-
-  async function submit () {
-    if (!canSubmit.value) return
-    submitting.value = true
-    error.value = ''
-    try {
-      const formData = buildWorkFormData({
-        title: form.title,
-        text: form.text,
-        category: form.category,
-        coverFile: coverFile.value,
-        attachmentFile: attachmentFile.value,
-        attachmentTitle: attachmentTitle.value,
-      })
-      const work = await worksStore.create(formData)
-      await navigateTo(`/work/${work.id}/read`)
-    } catch (error_: any) {
-      error.value = error_?.statusMessage || error_?.message || 'Gagal menerbitkan karya tulis'
-    } finally {
-      submitting.value = false
-    }
-  }
+}
 </script>

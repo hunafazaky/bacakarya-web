@@ -9,7 +9,7 @@ export default defineNuxtPlugin(() => {
 
   const api = $fetch.create({
     baseURL: config.public.apiBase,
-    onRequest ({ options }) {
+    onRequest({ options }) {
       const auth = useAuthStore()
       if (auth.token) {
         const headers = new Headers(options.headers)
@@ -17,9 +17,11 @@ export default defineNuxtPlugin(() => {
         options.headers = headers
       }
     },
-    onResponseError ({ response }) {
-      const message
-        = (response._data && response._data.message) || response.statusText || 'Request failed'
+    onResponseError({ response }) {
+      const message =
+        (response._data && response._data.message) ||
+        response.statusText ||
+        'Request failed'
       throw createError({
         statusCode: response.status,
         statusMessage: message,

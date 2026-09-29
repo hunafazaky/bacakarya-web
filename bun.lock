@@ -22,8 +22,10 @@
         "@pinia/nuxt": "^0.11.3",
         "@vuetify/mcp": "^0.5.0",
         "eslint": "^9.39.4",
+        "eslint-config-prettier": "^10.1.8",
         "eslint-config-vuetify": "^4.3.4",
         "openapi-typescript": "^7.13.0",
+        "prettier": "^3.9.9",
         "sass": "^1.98.0",
         "typescript": "^5.9.0",
         "vue-tsc": "^3.2.0",
@@ -1007,6 +1009,8 @@
 
     "eslint-config-flat-gitignore": ["eslint-config-flat-gitignore@2.4.0", "", { "dependencies": { "@eslint/compat": "^2.1.0" }, "peerDependencies": { "eslint": "^9.5.0 || ^10.0.0" } }, "sha512-JhYC+V7qEDiCDsbJcVP8fxNc62fk4+i91YLP/YvmVHlkaQ8Xo99olYN8MO5COdxl7onGlsrfZVONe5NYsZP1UA=="],
 
+    "eslint-config-prettier": ["eslint-config-prettier@10.1.8", "", { "peerDependencies": { "eslint": ">=7.0.0" }, "bin": { "eslint-config-prettier": "bin/cli.js" } }, "sha512-82GZUjRS0p/jganf6q1rEO25VSoHH0hKPCTrgillPjdI/3bgBhAE1QzHrHTizjpRvy6pGAvKjDJtk2pF9NDq8w=="],
+
     "eslint-config-vuetify": ["eslint-config-vuetify@4.7.2", "", { "dependencies": { "@clack/prompts": "^1.5.1", "@eslint/eslintrc": "^3.3.5", "@eslint/js": "^10.0.1", "@stylistic/eslint-plugin": "^5.10.0", "@typescript-eslint/parser": "^8.61.0", "eslint-config-flat-gitignore": "^2.3.0", "eslint-flat-config-utils": "^3.2.0", "eslint-plugin-antfu": "^3.2.3", "eslint-plugin-import-lite": "^0.6.0", "eslint-plugin-jsonc": "^3.2.0", "eslint-plugin-perfectionist": "^5.9.0", "eslint-plugin-pnpm": "^1.6.1", "eslint-plugin-regexp": "^3.1.0", "eslint-plugin-unicorn": "^65.0.1", "eslint-plugin-vue": "^10.9.2", "eslint-typegen": "^2.3.1", "exsolve": "^1.0.8", "globals": "^17.6.0", "jsonc-eslint-parser": "^3.1.0", "kolorist": "^1.8.0", "local-pkg": "^1.2.1", "nypm": "^0.6.6", "package-manager-detector": "^1.6.0", "tinyexec": "^1.2.4", "typescript-eslint": "^8.61.0", "vue-eslint-parser": "^10.4.1", "yaml-eslint-parser": "^2.0.0" }, "peerDependencies": { "@vitest/eslint-plugin": "^1.1.42", "eslint": "^9.5.0 || ^10.0.0", "eslint-plugin-import-x": "*", "eslint-plugin-jest": "^29.0.1", "eslint-plugin-no-only-tests": "^3.3.0", "eslint-plugin-vuejs-accessibility": "^2.0.0" }, "optionalPeers": ["@vitest/eslint-plugin", "eslint-plugin-import-x", "eslint-plugin-jest", "eslint-plugin-no-only-tests", "eslint-plugin-vuejs-accessibility"], "bin": { "eslint-config-vuetify": "bin/cli.mjs" } }, "sha512-61q06LqKSXtlsdCJB41aqPG3kxrmgewLt3mlKuTyEULbGU+tCg4T2r0XwoKAxnWr1P/Z4m643q0/lmQcyAVzMA=="],
 
     "eslint-flat-config-utils": ["eslint-flat-config-utils@3.2.0", "", { "dependencies": { "@eslint/config-helpers": "^0.5.5", "pathe": "^2.0.3" } }, "sha512-PHgo1X5uqIorJONLVD9BIaOSdoYFD3z/AeJljdqDPlWVRpeCYkDbK9k0AXoYVqqNJr6FEYIEr5Rm2TSktLQcHw=="],
@@ -1618,6 +1622,8 @@
     "powershell-utils": ["powershell-utils@0.2.1", "", {}, "sha512-C+y9x90UElAddDZmV4qOx9W53B61PO7cIqWz2dQsWlwswuq4mr8NEwytdGKboYbQlGZ3awrkTeNvcZiZNHnQ8A=="],
 
     "prelude-ls": ["prelude-ls@1.2.1", "", {}, "sha512-vkcDPrRZo1QZLbn5RLGPpg/WmIQ65qoWWhcGKf/b5eplkkarX0m9z8ppCat4mlOqUsWpyNuYgO3VRyrYHSzX5g=="],
+
+    "prettier": ["prettier@3.9.9", "", { "bin": { "prettier": "bin/prettier.cjs" } }, "sha512-Z/CJHIkdujO/OtN7nXUii0Rf3VT5SRuhjBA82Xvu2XhBUgX3nhP67T0LHceBdQLex7OOFGTox+Q5Yg8Jk2Qivg=="],
 
     "pretty-bytes": ["pretty-bytes@7.1.3", "", {}, "sha512-U2KZ675nqba6XSBppSjU2pRgc9Ffx9+uUtd/RTWYmOawVkZuUbBYuwdtFZQmLv+yMgQ2TQxWWuOpyNje67J9tg=="],
 

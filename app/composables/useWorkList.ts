@@ -1,6 +1,6 @@
 import type { PopulatedWork } from '~~/shared/types'
 
-export function useWorkList (getCategory?: () => string | undefined) {
+export function useWorkList(getCategory?: () => string | undefined) {
   const works = ref<PopulatedWork[]>([])
   const page = ref(1)
   const limit = 12
@@ -8,14 +8,15 @@ export function useWorkList (getCategory?: () => string | undefined) {
   const loading = ref(true)
   const worksStore = useWorksStore()
 
-  async function fetchWorks () {
+  async function fetchWorks() {
     loading.value = true
     try {
-      const { works: fetched, total: fetchedTotal } = await worksStore.fetchList({
-        page: page.value,
-        limit,
-        category: getCategory?.(),
-      })
+      const { works: fetched, total: fetchedTotal } =
+        await worksStore.fetchList({
+          page: page.value,
+          limit,
+          category: getCategory?.(),
+        })
       works.value.push(...fetched)
       total.value = fetchedTotal
     } finally {
@@ -23,7 +24,7 @@ export function useWorkList (getCategory?: () => string | undefined) {
     }
   }
 
-  async function loadMore () {
+  async function loadMore() {
     if (works.value.length >= total.value) {
       return
     }
@@ -31,22 +32,24 @@ export function useWorkList (getCategory?: () => string | undefined) {
     await fetchWorks()
   }
 
-  function reset () {
+  function reset() {
     page.value = 1
     works.value = []
     fetchWorks()
   }
 
-  function handleScroll () {
-    const nearBottom = window.innerHeight + window.scrollY >= document.documentElement.offsetHeight - 200
+  function handleScroll() {
+    const nearBottom =
+      window.innerHeight + window.scrollY >=
+      document.documentElement.offsetHeight - 200
     if (nearBottom && !loading.value) {
       loadMore()
     }
   }
 
-  async function deleteWork (id: string) {
+  async function deleteWork(id: string) {
     await worksStore.remove(id)
-    works.value = works.value.filter(w => w.id !== id)
+    works.value = works.value.filter((w) => w.id !== id)
     total.value = Math.max(0, total.value - 1)
   }
 

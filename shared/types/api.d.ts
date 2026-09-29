@@ -4,1168 +4,1238 @@
  */
 
 export interface paths {
-    "/users": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** List users */
-        get: {
-            parameters: {
-                query?: {
-                    /** @description Filter by exact username */
-                    username?: string;
-                };
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description List of users */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["UserListResponse"];
-                    };
-                };
-            };
-        };
-        put?: never;
-        /** Register a new user */
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["RegisterRequest"];
-                };
-            };
-            responses: {
-                /** @description User created */
-                201: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["UserResponse"];
-                    };
-                };
-                400: components["responses"]["BadRequest"];
-                /** @description Username already taken */
-                409: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["Error"];
-                    };
-                };
-            };
-        };
-        /** Delete all users */
-        delete: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                200: components["responses"]["Deleted"];
-                401: components["responses"]["Unauthorized"];
-            };
-        };
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/users/login": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Log in */
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["LoginRequest"];
-                };
-            };
-            responses: {
-                /** @description Authenticated */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["LoginResponseEnvelope"];
-                    };
-                };
-                /** @description Incorrect username or password */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["Error"];
-                    };
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/users/{id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /** @description MongoDB ObjectId */
-                id: components["parameters"]["IdParam"];
-            };
-            cookie?: never;
-        };
-        /** Get a user by id */
-        get: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    /** @description MongoDB ObjectId */
-                    id: components["parameters"]["IdParam"];
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description The user */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["UserResponse"];
-                    };
-                };
-                404: components["responses"]["NotFound"];
-            };
-        };
-        /**
-         * Update your own account
-         * @description Only `pen_name` and `photo` can be changed here. Requires the token to belong to this user id.
-         */
-        put: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    /** @description MongoDB ObjectId */
-                    id: components["parameters"]["IdParam"];
-                };
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["UserUpdateRequest"];
-                };
-            };
-            responses: {
-                /** @description Updated user */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["UserResponse"];
-                    };
-                };
-                401: components["responses"]["Unauthorized"];
-                403: components["responses"]["Forbidden"];
-            };
-        };
-        post?: never;
-        /**
-         * Delete your own account
-         * @description Also deletes all works this user wrote. Requires the token to belong to this user id.
-         */
-        delete: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    /** @description MongoDB ObjectId */
-                    id: components["parameters"]["IdParam"];
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                200: components["responses"]["Deleted"];
-                401: components["responses"]["Unauthorized"];
-                403: components["responses"]["Forbidden"];
-                404: components["responses"]["NotFound"];
-            };
-        };
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/works": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** List works (paginated) */
-        get: {
-            parameters: {
-                query?: {
-                    /** @description Case-insensitive substring match */
-                    title?: string;
-                    category?: string;
-                    page?: number;
-                    limit?: number;
-                };
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description Paginated works */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["WorkListResponse"];
-                    };
-                };
-            };
-        };
-        put?: never;
-        /**
-         * Create a work
-         * @description multipart/form-data. The writer is taken from the auth token, not from the request body. `cover` (max 2MB) and `attachment` (max 10MB) are uploaded files, both optimized/re-hosted server-side; `attachmentTitle` is a plain text label stored alongside the attachment's hosted URL. `category` is an array sent as repeated `category` fields (one text part per value) - this is the standard multipart array encoding (`style: form, explode: true`), which is what most OpenAPI-aware tooling renders by default for an array field in a form. A JSON-encoded array string (e.g. '["Fiction","Drama"]') in a single `category` field is also accepted, as is a single plain string for a one-item category.
-         */
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "multipart/form-data": components["schemas"]["WorkCreateForm"];
-                };
-            };
-            responses: {
-                /** @description Created work */
-                201: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["WorkResponse"];
-                    };
-                };
-                /** @description Invalid input, or cover/attachment file too large, wrong field name, cover not an image, or unreadable image data */
-                400: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["Error"];
-                    };
-                };
-                401: components["responses"]["Unauthorized"];
-                /** @description Cover or attachment upload to storage failed */
-                502: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["Error"];
-                    };
-                };
-            };
-        };
-        /** Delete all works */
-        delete: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                200: components["responses"]["Deleted"];
-                401: components["responses"]["Unauthorized"];
-            };
-        };
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/works/many": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Create several works at once
-         * @description The writer of every item is taken from the auth token, not from the request body. Body is `{ "works": [...] }`.
-         */
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": {
-                        works: components["schemas"]["WorkCreateRequest"][];
-                    };
-                };
-            };
-            responses: {
-                /** @description Created works */
-                201: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["WorkListResponse"];
-                    };
-                };
-                400: components["responses"]["BadRequest"];
-                401: components["responses"]["Unauthorized"];
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/works/{id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /** @description MongoDB ObjectId */
-                id: components["parameters"]["IdParam"];
-            };
-            cookie?: never;
-        };
-        /** Get a work by id */
-        get: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    /** @description MongoDB ObjectId */
-                    id: components["parameters"]["IdParam"];
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description The work */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["WorkResponse"];
-                    };
-                };
-                404: components["responses"]["NotFound"];
-            };
-        };
-        /**
-         * Update your own work
-         * @description multipart/form-data. Only `title`, `cover`, `attachment`, `attachmentTitle`, `text`, `category` can be changed, and only by the work's writer. `cover`/`attachment` are optional here - omit either to leave the existing value unchanged; include a new file to replace it (max 2MB for cover, 10MB for attachment, both re-hosted server-side). `category` is an array sent as repeated `category` fields (one text part per value) - the standard multipart array encoding (`style: form, explode: true`). A JSON-encoded array string or a single plain string are also accepted.
-         */
-        put: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    /** @description MongoDB ObjectId */
-                    id: components["parameters"]["IdParam"];
-                };
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "multipart/form-data": components["schemas"]["WorkUpdateForm"];
-                };
-            };
-            responses: {
-                /** @description Updated work */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["WorkResponse"];
-                    };
-                };
-                /** @description Invalid input, or cover/attachment file too large, wrong field name, cover not an image, or unreadable image data */
-                400: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["Error"];
-                    };
-                };
-                401: components["responses"]["Unauthorized"];
-                403: components["responses"]["Forbidden"];
-                404: components["responses"]["NotFound"];
-                /** @description Cover or attachment upload to storage failed */
-                502: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["Error"];
-                    };
-                };
-            };
-        };
-        post?: never;
-        /**
-         * Delete your own work
-         * @description Requires the token to belong to the work's writer.
-         */
-        delete: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    /** @description MongoDB ObjectId */
-                    id: components["parameters"]["IdParam"];
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                200: components["responses"]["Deleted"];
-                401: components["responses"]["Unauthorized"];
-                403: components["responses"]["Forbidden"];
-                404: components["responses"]["NotFound"];
-            };
-        };
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/works/{id}/read": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /** @description MongoDB ObjectId */
-                id: components["parameters"]["IdParam"];
-            };
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Mark a work as read by yourself
-         * @description Adds the authenticated user to Work.readers and the work to User.read_list in one call - the two fields are always updated together. Idempotent: reading the same work twice has no further effect.
-         */
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    /** @description MongoDB ObjectId */
-                    id: components["parameters"]["IdParam"];
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description Updated work */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["WorkResponse"];
-                    };
-                };
-                401: components["responses"]["Unauthorized"];
-                404: components["responses"]["NotFound"];
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/works/{id}/like": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /** @description MongoDB ObjectId */
-                id: components["parameters"]["IdParam"];
-            };
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Like a work as yourself
-         * @description Adds the authenticated user to Work.like_by and the work to User.like_list in one call. Idempotent.
-         */
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    /** @description MongoDB ObjectId */
-                    id: components["parameters"]["IdParam"];
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description Updated work */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["WorkResponse"];
-                    };
-                };
-                401: components["responses"]["Unauthorized"];
-                404: components["responses"]["NotFound"];
-            };
-        };
-        /**
-         * Unlike a work as yourself
-         * @description Removes the authenticated user from Work.like_by and the work from User.like_list in one call. Idempotent.
-         */
-        delete: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    /** @description MongoDB ObjectId */
-                    id: components["parameters"]["IdParam"];
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description Updated work */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["WorkResponse"];
-                    };
-                };
-                401: components["responses"]["Unauthorized"];
-                404: components["responses"]["NotFound"];
-            };
-        };
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/classifications": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Retrain the classifier from every existing work
-         * @description Any authenticated user for now (no admin role yet).
-         */
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description The retrained classifier's serialized model */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["TrainedModelResponse"];
-                    };
-                };
-                401: components["responses"]["Unauthorized"];
-            };
-        };
-        /** Delete all classification records */
-        delete: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                200: components["responses"]["Deleted"];
-                401: components["responses"]["Unauthorized"];
-            };
-        };
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/classifications/{id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /** @description MongoDB ObjectId */
-                id: components["parameters"]["IdParam"];
-            };
-            cookie?: never;
-        };
-        get?: never;
-        /**
-         * Teach the classifier a title/category example
-         * @description `id` is accepted for backward compatibility but not used - there is only ever one active classification model.
-         */
-        put: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    /** @description MongoDB ObjectId */
-                    id: components["parameters"]["IdParam"];
-                };
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": {
-                        title?: string;
-                        category?: string[];
-                    };
-                };
-            };
-            responses: {
-                /** @description Updated classification model */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ClassificationResponse"];
-                    };
-                };
-                401: components["responses"]["Unauthorized"];
-            };
-        };
-        post?: never;
-        /** Delete a classification record by id */
-        delete: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    /** @description MongoDB ObjectId */
-                    id: components["parameters"]["IdParam"];
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                200: components["responses"]["Deleted"];
-                401: components["responses"]["Unauthorized"];
-                404: components["responses"]["NotFound"];
-            };
-        };
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/recommendations": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** List all recommendation records */
-        get: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description List of recommendation records */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["RecommendationListResponse"];
-                    };
-                };
-                401: components["responses"]["Unauthorized"];
-            };
-        };
-        /**
-         * Submit a rating
-         * @description `user_id` in the body must match the authenticated user - you can only rate as yourself.
-         */
-        put: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["RatingRequest"];
-                };
-            };
-            responses: {
-                /** @description Updated recommendation record */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["RecommendationResponse"];
-                    };
-                };
-                401: components["responses"]["Unauthorized"];
-                403: components["responses"]["Forbidden"];
-            };
-        };
-        /**
-         * Retrain the recommendation table from every work's ratings
-         * @description Any authenticated user for now (no admin role yet).
-         */
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description The retrained ratings table */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["TrainedModelResponse"];
-                    };
-                };
-                401: components["responses"]["Unauthorized"];
-            };
-        };
-        /** Delete all recommendation records */
-        delete: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                200: components["responses"]["Deleted"];
-                401: components["responses"]["Unauthorized"];
-            };
-        };
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/recommendations/{id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /** @description MongoDB ObjectId */
-                id: components["parameters"]["IdParam"];
-            };
-            cookie?: never;
-        };
-        /**
-         * Get recommended works for a user
-         * @description `id` is a user id. Requires the token to belong to this user.
-         */
-        get: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    /** @description MongoDB ObjectId */
-                    id: components["parameters"]["IdParam"];
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description Recommended works, ordered by predicted priority */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["WorkListDataResponse"];
-                    };
-                };
-                401: components["responses"]["Unauthorized"];
-                403: components["responses"]["Forbidden"];
-            };
-        };
-        put?: never;
-        post?: never;
-        /** Delete a recommendation record by id */
-        delete: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    /** @description MongoDB ObjectId */
-                    id: components["parameters"]["IdParam"];
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                200: components["responses"]["Deleted"];
-                401: components["responses"]["Unauthorized"];
-                404: components["responses"]["NotFound"];
-            };
-        };
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-}
-export type webhooks = Record<string, never>;
-export interface components {
-    schemas: {
-        Error: {
-            /** @example null */
-            data?: unknown;
-            message?: string;
-        };
-        DeletedResponse: {
-            /** @example null */
-            data?: unknown;
-            message?: string;
-        };
-        PaginationMeta: {
-            total?: number;
-            page?: number;
-            totalPages?: number;
-        };
-        /** @description Wraps a raw, internal model object - shape is implementation-specific and not part of the stable contract. */
-        TrainedModelResponse: {
-            data?: Record<string, never>;
-            message?: string | null;
-        };
-        RegisterRequest: {
-            username: string;
-            pen_name: string;
-            /** Format: password */
-            password: string;
-        };
-        LoginRequest: {
-            username: string;
-            /** Format: password */
-            password: string;
-        };
-        LoginResponse: {
-            user?: components["schemas"]["User"];
-            /** @description JWT, valid for 7 days. Send as `Authorization: Bearer <token>`. */
-            token?: string;
-        };
-        LoginResponseEnvelope: {
-            data?: components["schemas"]["LoginResponse"];
-            message?: string | null;
-        };
-        UserUpdateRequest: {
-            pen_name?: string;
-            /** Format: uri */
-            photo?: string;
-        };
-        User: {
-            id?: string;
-            username?: string;
-            pen_name?: string;
-            /** Format: uri */
-            photo?: string;
-            /** @description Work ids (or populated Work objects, depending on the endpoint) */
-            work_list?: string[];
-            read_list?: string[];
-            like_list?: string[];
-            rate_list?: components["schemas"]["UserRating"][];
-            /** Format: date-time */
-            createdAt?: string;
-            /** Format: date-time */
-            updatedAt?: string;
-        };
-        UserRating: {
-            work_id?: string;
-            rating?: number;
-        };
-        UserResponse: {
-            data?: components["schemas"]["User"];
-            message?: string | null;
-        };
-        UserListResponse: {
-            data?: components["schemas"]["User"][];
-            message?: string | null;
-        };
-        /** @description Used by POST /works/many, where cover is already a hosted URL rather than a file. */
-        WorkCreateRequest: {
-            title: string;
-            /** Format: uri */
-            cover: string;
-            attachment?: components["schemas"]["Attachment"];
-            text: string;
-            /** @description Author-chosen categories; the classifier's own suggestion is prepended server-side. */
-            category: string[];
-        };
-        /** @description multipart/form-data body for POST /works. `category` is typed here as its real JSON shape; see the operation's `encoding` block for how it's actually transmitted as a multipart part. */
-        WorkCreateForm: {
-            title: string;
-            /**
-             * Format: binary
-             * @description Image file, max 2MB. Resized and re-encoded server-side before storage.
-             */
-            cover: string;
-            /**
-             * Format: binary
-             * @description Optional file (max 10MB) - a PDF, audio, or other supplementary file for the work. Not necessarily an image, so it's stored as-is (no resize/re-encode). Uploaded and combined with `attachmentTitle` into the work's `{ title, link }` attachment field.
-             */
-            attachment?: string;
-            /** @description Label for the attachment. Falls back to the uploaded file's own name if omitted. */
-            attachmentTitle?: string;
-            text: string;
-            /** @description Author-chosen categories; the classifier's own suggestion is prepended server-side. */
-            category: string[];
-        };
-        /** @description multipart/form-data body for PUT /works/{id}. All fields optional; omit `cover`/`attachment` to leave the existing values unchanged. `category` is typed here as its real JSON shape; see the operation's `encoding` block for how it's actually transmitted as a multipart part. */
-        WorkUpdateForm: {
-            title?: string;
-            /**
-             * Format: binary
-             * @description Image file, max 2MB. Replaces the existing cover if provided.
-             */
-            cover?: string;
-            /**
-             * Format: binary
-             * @description Optional file, max 10MB. Replaces the existing attachment if provided.
-             */
-            attachment?: string;
-            /** @description Label for the new attachment, if one is being uploaded. */
-            attachmentTitle?: string;
-            text?: string;
-            category?: string[];
-        };
-        Attachment: {
-            title?: string;
-            /** Format: uri */
-            link?: string;
-        };
-        Work: {
-            id?: string;
-            title?: string;
-            /** Format: uri */
-            cover?: string;
-            attachment?: components["schemas"]["Attachment"];
-            /** @description User id (or a populated User object, depending on the endpoint) */
-            writer?: string;
-            readers?: string[];
-            like_by?: string[];
-            rate_by?: components["schemas"]["WorkRating"][];
-            category?: string[];
-            text?: string;
-            /** Format: date-time */
-            createdAt?: string;
-            /** Format: date-time */
-            updatedAt?: string;
-        };
-        WorkRating: {
-            user_id?: string;
-            rating?: number;
-        };
-        WorkResponse: {
-            data?: components["schemas"]["Work"];
-            message?: string | null;
-        };
-        WorkListResponse: {
-            data?: components["schemas"]["Work"][];
-            message?: string | null;
-            meta?: components["schemas"]["PaginationMeta"];
-        };
-        /** @description Like WorkListResponse but without pagination meta (e.g. a recommendation list). */
-        WorkListDataResponse: {
-            data?: components["schemas"]["Work"][];
-            message?: string | null;
-        };
-        Classification: {
-            id?: string;
-            /** @description Serialized Bayes classifier model. */
-            data_trained?: Record<string, never>;
-            /** Format: date-time */
-            createdAt?: string;
-            /** Format: date-time */
-            updatedAt?: string;
-        };
-        ClassificationResponse: {
-            data?: components["schemas"]["Classification"];
-            message?: string | null;
-        };
-        Recommendation: {
-            id?: string;
-            /** @description Serialized ratings table (rows = works, columns = users). */
-            data_trained?: Record<string, never>;
-            /** Format: date-time */
-            createdAt?: string;
-            /** Format: date-time */
-            updatedAt?: string;
-        };
-        RecommendationResponse: {
-            data?: components["schemas"]["Recommendation"];
-            message?: string | null;
-        };
-        RecommendationListResponse: {
-            data?: components["schemas"]["Recommendation"][];
-            message?: string | null;
-        };
-        RatingRequest: {
-            work_id: string;
-            /** @description Must match the authenticated user's id. */
-            user_id: string;
-            rating: number;
-        };
-    };
-    responses: {
-        /** @description Invalid input */
-        BadRequest: {
-            headers: {
-                [name: string]: unknown;
-            };
-            content: {
-                "application/json": components["schemas"]["Error"];
-            };
-        };
-        /** @description Missing or invalid token */
-        Unauthorized: {
-            headers: {
-                [name: string]: unknown;
-            };
-            content: {
-                "application/json": components["schemas"]["Error"];
-            };
-        };
-        /** @description Authenticated, but not allowed to act on this resource */
-        Forbidden: {
-            headers: {
-                [name: string]: unknown;
-            };
-            content: {
-                "application/json": components["schemas"]["Error"];
-            };
-        };
-        /** @description Resource not found */
-        NotFound: {
-            headers: {
-                [name: string]: unknown;
-            };
-            content: {
-                "application/json": components["schemas"]["Error"];
-            };
-        };
-        /** @description Deleted */
-        Deleted: {
-            headers: {
-                [name: string]: unknown;
-            };
-            content: {
-                "application/json": components["schemas"]["DeletedResponse"];
-            };
-        };
-    };
+  '/users': {
     parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * List users
+     * @description Each user's `work_list`, `read_list` and `like_list` are populated with full Work objects (see `UserWithWorks`). Those nested works are raw: their own `writer`/`readers`/`like_by` are ids.
+     */
+    get: {
+      parameters: {
+        query?: {
+          /** @description Filter by exact username */
+          username?: string
+        }
+        header?: never
+        path?: never
+        cookie?: never
+      }
+      requestBody?: never
+      responses: {
+        /** @description List of users */
+        200: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            'application/json': components['schemas']['UserListResponse']
+          }
+        }
+      }
+    }
+    put?: never
+    /** Register a new user */
+    post: {
+      parameters: {
+        query?: never
+        header?: never
+        path?: never
+        cookie?: never
+      }
+      requestBody: {
+        content: {
+          'application/json': components['schemas']['RegisterRequest']
+        }
+      }
+      responses: {
+        /** @description User created */
+        201: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            'application/json': components['schemas']['UserResponse']
+          }
+        }
+        400: components['responses']['BadRequest']
+        /** @description Username already taken */
+        409: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            'application/json': components['schemas']['Error']
+          }
+        }
+      }
+    }
+    /** Delete all users */
+    delete: {
+      parameters: {
+        query?: never
+        header?: never
+        path?: never
+        cookie?: never
+      }
+      requestBody?: never
+      responses: {
+        200: components['responses']['Deleted']
+        401: components['responses']['Unauthorized']
+      }
+    }
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/users/login': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Log in
+     * @description The returned `user` has `work_list`, `read_list` and `like_list` populated with full Work objects (see `UserWithWorks`).
+     */
+    post: {
+      parameters: {
+        query?: never
+        header?: never
+        path?: never
+        cookie?: never
+      }
+      requestBody: {
+        content: {
+          'application/json': components['schemas']['LoginRequest']
+        }
+      }
+      responses: {
+        /** @description Authenticated */
+        200: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            'application/json': components['schemas']['LoginResponseEnvelope']
+          }
+        }
+        /** @description Incorrect username or password */
+        401: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            'application/json': components['schemas']['Error']
+          }
+        }
+      }
+    }
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/users/{id}': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
         /** @description MongoDB ObjectId */
-        IdParam: string;
-    };
-    requestBodies: never;
-    headers: never;
-    pathItems: never;
+        id: components['parameters']['IdParam']
+      }
+      cookie?: never
+    }
+    /**
+     * Get a user by id
+     * @description `work_list`, `read_list` and `like_list` are populated with full Work objects. Unlike `GET /users` and `POST /users/login`, this endpoint also populates one level deeper: each `read_list` work has its `readers` populated, and each `like_list` work has its `writer` populated (see `UserDetail`). `work_list` items are raw.
+     */
+    get: {
+      parameters: {
+        query?: never
+        header?: never
+        path: {
+          /** @description MongoDB ObjectId */
+          id: components['parameters']['IdParam']
+        }
+        cookie?: never
+      }
+      requestBody?: never
+      responses: {
+        /** @description The user */
+        200: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            'application/json': components['schemas']['UserDetailResponse']
+          }
+        }
+        404: components['responses']['NotFound']
+      }
+    }
+    /**
+     * Update your own account
+     * @description Only `pen_name` and `photo` can be changed here. Requires the token to belong to this user id.
+     */
+    put: {
+      parameters: {
+        query?: never
+        header?: never
+        path: {
+          /** @description MongoDB ObjectId */
+          id: components['parameters']['IdParam']
+        }
+        cookie?: never
+      }
+      requestBody: {
+        content: {
+          'application/json': components['schemas']['UserUpdateRequest']
+        }
+      }
+      responses: {
+        /** @description Updated user, with its lists populated (see `UserWithWorks`) */
+        200: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            'application/json': components['schemas']['UserWithWorksResponse']
+          }
+        }
+        401: components['responses']['Unauthorized']
+        403: components['responses']['Forbidden']
+      }
+    }
+    post?: never
+    /**
+     * Delete your own account
+     * @description Also deletes all works this user wrote. Requires the token to belong to this user id.
+     */
+    delete: {
+      parameters: {
+        query?: never
+        header?: never
+        path: {
+          /** @description MongoDB ObjectId */
+          id: components['parameters']['IdParam']
+        }
+        cookie?: never
+      }
+      requestBody?: never
+      responses: {
+        200: components['responses']['Deleted']
+        401: components['responses']['Unauthorized']
+        403: components['responses']['Forbidden']
+        404: components['responses']['NotFound']
+      }
+    }
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/works': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * List works (paginated)
+     * @description Each work has `writer`, `readers` and `like_by` populated with full User objects (see `PopulatedWork`).
+     */
+    get: {
+      parameters: {
+        query?: {
+          /** @description Case-insensitive substring match */
+          title?: string
+          category?: string
+          page?: number
+          limit?: number
+        }
+        header?: never
+        path?: never
+        cookie?: never
+      }
+      requestBody?: never
+      responses: {
+        /** @description Paginated works */
+        200: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            'application/json': components['schemas']['PopulatedWorkListResponse']
+          }
+        }
+      }
+    }
+    put?: never
+    /**
+     * Create a work
+     * @description multipart/form-data. The writer is taken from the auth token, not from the request body. `cover` (max 2MB) and `attachment` (max 10MB) are uploaded files, both optimized/re-hosted server-side; `attachmentTitle` is a plain text label stored alongside the attachment's hosted URL. `category` is an array sent as repeated `category` fields (one text part per value) - this is the standard multipart array encoding (`style: form, explode: true`), which is what most OpenAPI-aware tooling renders by default for an array field in a form. A JSON-encoded array string (e.g. '["Fiction","Drama"]') in a single `category` field is also accepted, as is a single plain string for a one-item category.
+     */
+    post: {
+      parameters: {
+        query?: never
+        header?: never
+        path?: never
+        cookie?: never
+      }
+      requestBody: {
+        content: {
+          'multipart/form-data': components['schemas']['WorkCreateForm']
+        }
+      }
+      responses: {
+        /** @description Created work, as a raw (unpopulated) document: `writer` is a user id and `readers`/`like_by` are empty. Fetch `GET /works/{id}` for the populated version. */
+        201: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            'application/json': components['schemas']['WorkResponse']
+          }
+        }
+        /** @description Invalid input, or cover/attachment file too large, wrong field name, cover not an image, or unreadable image data */
+        400: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            'application/json': components['schemas']['Error']
+          }
+        }
+        401: components['responses']['Unauthorized']
+        /** @description Cover or attachment upload to storage failed */
+        502: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            'application/json': components['schemas']['Error']
+          }
+        }
+      }
+    }
+    /** Delete all works */
+    delete: {
+      parameters: {
+        query?: never
+        header?: never
+        path?: never
+        cookie?: never
+      }
+      requestBody?: never
+      responses: {
+        200: components['responses']['Deleted']
+        401: components['responses']['Unauthorized']
+      }
+    }
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/works/many': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Create several works at once
+     * @description The writer of every item is taken from the auth token, not from the request body. Body is `{ "works": [...] }`.
+     */
+    post: {
+      parameters: {
+        query?: never
+        header?: never
+        path?: never
+        cookie?: never
+      }
+      requestBody: {
+        content: {
+          'application/json': {
+            works: components['schemas']['WorkCreateRequest'][]
+          }
+        }
+      }
+      responses: {
+        /** @description Created works, as raw (unpopulated) documents */
+        201: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            'application/json': components['schemas']['WorkListResponse']
+          }
+        }
+        400: components['responses']['BadRequest']
+        401: components['responses']['Unauthorized']
+      }
+    }
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/works/{id}': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description MongoDB ObjectId */
+        id: components['parameters']['IdParam']
+      }
+      cookie?: never
+    }
+    /**
+     * Get a work by id
+     * @description `writer`, `readers` and `like_by` are populated with full User objects (see `PopulatedWork`).
+     */
+    get: {
+      parameters: {
+        query?: never
+        header?: never
+        path: {
+          /** @description MongoDB ObjectId */
+          id: components['parameters']['IdParam']
+        }
+        cookie?: never
+      }
+      requestBody?: never
+      responses: {
+        /** @description The work */
+        200: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            'application/json': components['schemas']['PopulatedWorkResponse']
+          }
+        }
+        404: components['responses']['NotFound']
+      }
+    }
+    /**
+     * Update your own work
+     * @description multipart/form-data. Only `title`, `cover`, `attachment`, `attachmentTitle`, `text`, `category` can be changed, and only by the work's writer. `cover`/`attachment` are optional here - omit either to leave the existing value unchanged; include a new file to replace it (max 2MB for cover, 10MB for attachment, both re-hosted server-side). `category` is an array sent as repeated `category` fields (one text part per value) - the standard multipart array encoding (`style: form, explode: true`). A JSON-encoded array string or a single plain string are also accepted.
+     */
+    put: {
+      parameters: {
+        query?: never
+        header?: never
+        path: {
+          /** @description MongoDB ObjectId */
+          id: components['parameters']['IdParam']
+        }
+        cookie?: never
+      }
+      requestBody: {
+        content: {
+          'multipart/form-data': components['schemas']['WorkUpdateForm']
+        }
+      }
+      responses: {
+        /** @description Updated work, as a raw (unpopulated) document: `writer`, `readers` and `like_by` are ids here, unlike `GET /works/{id}`. */
+        200: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            'application/json': components['schemas']['WorkResponse']
+          }
+        }
+        /** @description Invalid input, or cover/attachment file too large, wrong field name, cover not an image, or unreadable image data */
+        400: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            'application/json': components['schemas']['Error']
+          }
+        }
+        401: components['responses']['Unauthorized']
+        403: components['responses']['Forbidden']
+        404: components['responses']['NotFound']
+        /** @description Cover or attachment upload to storage failed */
+        502: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            'application/json': components['schemas']['Error']
+          }
+        }
+      }
+    }
+    post?: never
+    /**
+     * Delete your own work
+     * @description Requires the token to belong to the work's writer.
+     */
+    delete: {
+      parameters: {
+        query?: never
+        header?: never
+        path: {
+          /** @description MongoDB ObjectId */
+          id: components['parameters']['IdParam']
+        }
+        cookie?: never
+      }
+      requestBody?: never
+      responses: {
+        200: components['responses']['Deleted']
+        401: components['responses']['Unauthorized']
+        403: components['responses']['Forbidden']
+        404: components['responses']['NotFound']
+      }
+    }
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/works/{id}/read': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description MongoDB ObjectId */
+        id: components['parameters']['IdParam']
+      }
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Mark a work as read by yourself
+     * @description Adds the authenticated user to Work.readers and the work to User.read_list in one call - the two fields are always updated together. Idempotent: reading the same work twice has no further effect.
+     */
+    post: {
+      parameters: {
+        query?: never
+        header?: never
+        path: {
+          /** @description MongoDB ObjectId */
+          id: components['parameters']['IdParam']
+        }
+        cookie?: never
+      }
+      requestBody?: never
+      responses: {
+        /** @description Updated work, populated (see `PopulatedWork`) */
+        200: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            'application/json': components['schemas']['PopulatedWorkResponse']
+          }
+        }
+        401: components['responses']['Unauthorized']
+        404: components['responses']['NotFound']
+      }
+    }
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/works/{id}/like': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description MongoDB ObjectId */
+        id: components['parameters']['IdParam']
+      }
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Like a work as yourself
+     * @description Adds the authenticated user to Work.like_by and the work to User.like_list in one call. Idempotent.
+     */
+    post: {
+      parameters: {
+        query?: never
+        header?: never
+        path: {
+          /** @description MongoDB ObjectId */
+          id: components['parameters']['IdParam']
+        }
+        cookie?: never
+      }
+      requestBody?: never
+      responses: {
+        /** @description Updated work, populated (see `PopulatedWork`) */
+        200: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            'application/json': components['schemas']['PopulatedWorkResponse']
+          }
+        }
+        401: components['responses']['Unauthorized']
+        404: components['responses']['NotFound']
+      }
+    }
+    /**
+     * Unlike a work as yourself
+     * @description Removes the authenticated user from Work.like_by and the work from User.like_list in one call. Idempotent.
+     */
+    delete: {
+      parameters: {
+        query?: never
+        header?: never
+        path: {
+          /** @description MongoDB ObjectId */
+          id: components['parameters']['IdParam']
+        }
+        cookie?: never
+      }
+      requestBody?: never
+      responses: {
+        /** @description Updated work, populated (see `PopulatedWork`) */
+        200: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            'application/json': components['schemas']['PopulatedWorkResponse']
+          }
+        }
+        401: components['responses']['Unauthorized']
+        404: components['responses']['NotFound']
+      }
+    }
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/classifications': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Retrain the classifier from every existing work
+     * @description Any authenticated user for now (no admin role yet).
+     */
+    post: {
+      parameters: {
+        query?: never
+        header?: never
+        path?: never
+        cookie?: never
+      }
+      requestBody?: never
+      responses: {
+        /** @description The retrained classifier's serialized model */
+        200: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            'application/json': components['schemas']['TrainedModelResponse']
+          }
+        }
+        401: components['responses']['Unauthorized']
+      }
+    }
+    /** Delete all classification records */
+    delete: {
+      parameters: {
+        query?: never
+        header?: never
+        path?: never
+        cookie?: never
+      }
+      requestBody?: never
+      responses: {
+        200: components['responses']['Deleted']
+        401: components['responses']['Unauthorized']
+      }
+    }
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/classifications/{id}': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description MongoDB ObjectId */
+        id: components['parameters']['IdParam']
+      }
+      cookie?: never
+    }
+    get?: never
+    /**
+     * Teach the classifier a title/category example
+     * @description `id` is accepted for backward compatibility but not used - there is only ever one active classification model.
+     */
+    put: {
+      parameters: {
+        query?: never
+        header?: never
+        path: {
+          /** @description MongoDB ObjectId */
+          id: components['parameters']['IdParam']
+        }
+        cookie?: never
+      }
+      requestBody: {
+        content: {
+          'application/json': {
+            title?: string
+            category?: string[]
+          }
+        }
+      }
+      responses: {
+        /** @description Updated classification model */
+        200: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            'application/json': components['schemas']['ClassificationResponse']
+          }
+        }
+        401: components['responses']['Unauthorized']
+      }
+    }
+    post?: never
+    /** Delete a classification record by id */
+    delete: {
+      parameters: {
+        query?: never
+        header?: never
+        path: {
+          /** @description MongoDB ObjectId */
+          id: components['parameters']['IdParam']
+        }
+        cookie?: never
+      }
+      requestBody?: never
+      responses: {
+        200: components['responses']['Deleted']
+        401: components['responses']['Unauthorized']
+        404: components['responses']['NotFound']
+      }
+    }
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/recommendations': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** List all recommendation records */
+    get: {
+      parameters: {
+        query?: never
+        header?: never
+        path?: never
+        cookie?: never
+      }
+      requestBody?: never
+      responses: {
+        /** @description List of recommendation records */
+        200: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            'application/json': components['schemas']['RecommendationListResponse']
+          }
+        }
+        401: components['responses']['Unauthorized']
+      }
+    }
+    /**
+     * Submit a rating
+     * @description `user_id` in the body must match the authenticated user - you can only rate as yourself.
+     */
+    put: {
+      parameters: {
+        query?: never
+        header?: never
+        path?: never
+        cookie?: never
+      }
+      requestBody: {
+        content: {
+          'application/json': components['schemas']['RatingRequest']
+        }
+      }
+      responses: {
+        /** @description Updated recommendation record */
+        200: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            'application/json': components['schemas']['RecommendationResponse']
+          }
+        }
+        401: components['responses']['Unauthorized']
+        403: components['responses']['Forbidden']
+      }
+    }
+    /**
+     * Retrain the recommendation table from every work's ratings
+     * @description Any authenticated user for now (no admin role yet).
+     */
+    post: {
+      parameters: {
+        query?: never
+        header?: never
+        path?: never
+        cookie?: never
+      }
+      requestBody?: never
+      responses: {
+        /** @description The retrained ratings table */
+        200: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            'application/json': components['schemas']['TrainedModelResponse']
+          }
+        }
+        401: components['responses']['Unauthorized']
+      }
+    }
+    /** Delete all recommendation records */
+    delete: {
+      parameters: {
+        query?: never
+        header?: never
+        path?: never
+        cookie?: never
+      }
+      requestBody?: never
+      responses: {
+        200: components['responses']['Deleted']
+        401: components['responses']['Unauthorized']
+      }
+    }
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/recommendations/{id}': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description MongoDB ObjectId */
+        id: components['parameters']['IdParam']
+      }
+      cookie?: never
+    }
+    /**
+     * Get recommended works for a user
+     * @description `id` is a user id. Requires the token to belong to this user. Each work has `writer`, `readers` and `like_by` populated (see `PopulatedWork`).
+     */
+    get: {
+      parameters: {
+        query?: never
+        header?: never
+        path: {
+          /** @description MongoDB ObjectId */
+          id: components['parameters']['IdParam']
+        }
+        cookie?: never
+      }
+      requestBody?: never
+      responses: {
+        /** @description Recommended works, ordered by predicted priority */
+        200: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            'application/json': components['schemas']['PopulatedWorkListResponse']
+          }
+        }
+        401: components['responses']['Unauthorized']
+        403: components['responses']['Forbidden']
+      }
+    }
+    put?: never
+    post?: never
+    /** Delete a recommendation record by id */
+    delete: {
+      parameters: {
+        query?: never
+        header?: never
+        path: {
+          /** @description MongoDB ObjectId */
+          id: components['parameters']['IdParam']
+        }
+        cookie?: never
+      }
+      requestBody?: never
+      responses: {
+        200: components['responses']['Deleted']
+        401: components['responses']['Unauthorized']
+        404: components['responses']['NotFound']
+      }
+    }
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
 }
-export type $defs = Record<string, never>;
-export type operations = Record<string, never>;
+export type webhooks = Record<string, never>
+export interface components {
+  schemas: {
+    Error: {
+      /** @example null */
+      data?: unknown
+      message?: string
+    }
+    DeletedResponse: {
+      /** @example null */
+      data?: unknown
+      message?: string
+    }
+    PaginationMeta: {
+      total?: number
+      page?: number
+      totalPages?: number
+    }
+    /** @description Wraps a raw, internal model object - shape is implementation-specific and not part of the stable contract. */
+    TrainedModelResponse: {
+      data?: Record<string, never>
+      message?: string | null
+    }
+    RegisterRequest: {
+      username: string
+      pen_name: string
+      /** Format: password */
+      password: string
+    }
+    LoginRequest: {
+      username: string
+      /** Format: password */
+      password: string
+    }
+    LoginResponse: {
+      user?: components['schemas']['UserWithWorks']
+      /** @description JWT, valid for 7 days. Send as `Authorization: Bearer <token>`. */
+      token?: string
+    }
+    LoginResponseEnvelope: {
+      data?: components['schemas']['LoginResponse']
+      message?: string | null
+    }
+    UserUpdateRequest: {
+      pen_name?: string
+      /** Format: uri */
+      photo?: string
+    }
+    /** @description Fields common to every User variant (everything except the three work lists). */
+    UserBase: {
+      id?: string
+      username?: string
+      pen_name?: string
+      /** Format: uri */
+      photo?: string
+      rate_list?: components['schemas']['UserRating'][]
+      /** Format: date-time */
+      createdAt?: string
+      /** Format: date-time */
+      updatedAt?: string
+    }
+    /** @description A raw user: `work_list`, `read_list` and `like_list` are plain work ids. Returned by `POST /users`, and is the shape of a User populated into another document (e.g. `PopulatedWork.writer`). */
+    User: components['schemas']['UserBase'] & {
+      /** @description Ids of the works this user wrote */
+      work_list?: string[]
+      /** @description Ids of the works this user has read */
+      read_list?: string[]
+      /** @description Ids of the works this user has liked */
+      like_list?: string[]
+    }
+    /** @description A user with all three lists populated with full (raw) Work objects. Returned by `GET /users`, `PUT /users/{id}` and `POST /users/login`. */
+    UserWithWorks: components['schemas']['UserBase'] & {
+      work_list?: components['schemas']['Work'][]
+      read_list?: components['schemas']['Work'][]
+      like_list?: components['schemas']['Work'][]
+    }
+    /** @description Returned by `GET /users/{id}` only. Like `UserWithWorks`, plus one extra level of population: each `read_list` work has its `readers` populated, and each `like_list` work has its `writer` populated. */
+    UserDetail: components['schemas']['UserBase'] & {
+      work_list?: components['schemas']['Work'][]
+      read_list?: components['schemas']['WorkWithReaders'][]
+      like_list?: components['schemas']['WorkWithWriter'][]
+    }
+    UserRating: {
+      work_id?: string
+      rating?: number
+    }
+    UserResponse: {
+      data?: components['schemas']['User']
+      message?: string | null
+    }
+    UserWithWorksResponse: {
+      data?: components['schemas']['UserWithWorks']
+      message?: string | null
+    }
+    UserDetailResponse: {
+      data?: components['schemas']['UserDetail']
+      message?: string | null
+    }
+    UserListResponse: {
+      data?: components['schemas']['UserWithWorks'][]
+      message?: string | null
+    }
+    /** @description Used by POST /works/many, where cover is already a hosted URL rather than a file. */
+    WorkCreateRequest: {
+      title: string
+      /** Format: uri */
+      cover: string
+      attachment?: components['schemas']['Attachment']
+      text: string
+      /** @description Author-chosen categories; the classifier's own suggestion is prepended server-side. */
+      category: string[]
+    }
+    /** @description multipart/form-data body for POST /works. `category` is typed here as its real JSON shape; see the operation's `encoding` block for how it's actually transmitted as a multipart part. */
+    WorkCreateForm: {
+      title: string
+      /**
+       * Format: binary
+       * @description Image file, max 2MB. Resized and re-encoded server-side before storage.
+       */
+      cover: string
+      /**
+       * Format: binary
+       * @description Optional file (max 10MB) - a PDF, audio, or other supplementary file for the work. Not necessarily an image, so it's stored as-is (no resize/re-encode). Uploaded and combined with `attachmentTitle` into the work's `{ title, link }` attachment field.
+       */
+      attachment?: string
+      /** @description Label for the attachment. Falls back to the uploaded file's own name if omitted. */
+      attachmentTitle?: string
+      text: string
+      /** @description Author-chosen categories; the classifier's own suggestion is prepended server-side. */
+      category: string[]
+    }
+    /** @description multipart/form-data body for PUT /works/{id}. All fields optional; omit `cover`/`attachment` to leave the existing values unchanged. `category` is typed here as its real JSON shape; see the operation's `encoding` block for how it's actually transmitted as a multipart part. */
+    WorkUpdateForm: {
+      title?: string
+      /**
+       * Format: binary
+       * @description Image file, max 2MB. Replaces the existing cover if provided.
+       */
+      cover?: string
+      /**
+       * Format: binary
+       * @description Optional file, max 10MB. Replaces the existing attachment if provided.
+       */
+      attachment?: string
+      /** @description Label for the new attachment, if one is being uploaded. */
+      attachmentTitle?: string
+      text?: string
+      category?: string[]
+    }
+    Attachment: {
+      title?: string
+      /** Format: uri */
+      link?: string
+    }
+    /** @description Fields common to every Work variant (everything except writer, readers and like_by). */
+    WorkBase: {
+      id?: string
+      title?: string
+      /** Format: uri */
+      cover?: string
+      attachment?: components['schemas']['Attachment']
+      rate_by?: components['schemas']['WorkRating'][]
+      category?: string[]
+      text?: string
+      /** Format: date-time */
+      createdAt?: string
+      /** Format: date-time */
+      updatedAt?: string
+    }
+    /** @description A raw work: `writer`, `readers` and `like_by` are plain user ids. Returned by `POST /works`, `POST /works/many` and `PUT /works/{id}`, and is the shape of a Work populated into a User's lists. */
+    Work: components['schemas']['WorkBase'] & {
+      /** @description Id of the user who wrote this work */
+      writer?: string
+      /** @description Ids of users who have read this work */
+      readers?: string[]
+      /** @description Ids of users who have liked this work */
+      like_by?: string[]
+    }
+    /** @description A work with `writer`, `readers` and `like_by` populated with full (raw) User objects. Returned by `GET /works`, `GET /works/{id}`, `GET /recommendations/{id}`, and the read/like/unlike endpoints. */
+    PopulatedWork: components['schemas']['WorkBase'] & {
+      writer?: components['schemas']['User']
+      readers?: components['schemas']['User'][]
+      like_by?: components['schemas']['User'][]
+    }
+    /** @description A work with only `readers` populated (`writer` and `like_by` stay ids). Appears as an item of `UserDetail.read_list`. */
+    WorkWithReaders: components['schemas']['WorkBase'] & {
+      writer?: string
+      readers?: components['schemas']['User'][]
+      like_by?: string[]
+    }
+    /** @description A work with only `writer` populated (`readers` and `like_by` stay ids). Appears as an item of `UserDetail.like_list`. */
+    WorkWithWriter: components['schemas']['WorkBase'] & {
+      writer?: components['schemas']['User']
+      readers?: string[]
+      like_by?: string[]
+    }
+    WorkRating: {
+      user_id?: string
+      rating?: number
+    }
+    WorkResponse: {
+      data?: components['schemas']['Work']
+      message?: string | null
+    }
+    PopulatedWorkResponse: {
+      data?: components['schemas']['PopulatedWork']
+      message?: string | null
+    }
+    /** @description A list of raw works, with no pagination meta (e.g. the result of POST /works/many). */
+    WorkListResponse: {
+      data?: components['schemas']['Work'][]
+      message?: string | null
+    }
+    /** @description A list of populated works. `meta` is present only on the paginated `GET /works`, not on `GET /recommendations/{id}`. */
+    PopulatedWorkListResponse: {
+      data?: components['schemas']['PopulatedWork'][]
+      message?: string | null
+      meta?: components['schemas']['PaginationMeta']
+    }
+    Classification: {
+      id?: string
+      /** @description Serialized Bayes classifier model. */
+      data_trained?: Record<string, never>
+      /** Format: date-time */
+      createdAt?: string
+      /** Format: date-time */
+      updatedAt?: string
+    }
+    ClassificationResponse: {
+      data?: components['schemas']['Classification']
+      message?: string | null
+    }
+    Recommendation: {
+      id?: string
+      /** @description Serialized ratings table (rows = works, columns = users). */
+      data_trained?: Record<string, never>
+      /** Format: date-time */
+      createdAt?: string
+      /** Format: date-time */
+      updatedAt?: string
+    }
+    RecommendationResponse: {
+      data?: components['schemas']['Recommendation']
+      message?: string | null
+    }
+    RecommendationListResponse: {
+      data?: components['schemas']['Recommendation'][]
+      message?: string | null
+    }
+    RatingRequest: {
+      work_id: string
+      /** @description Must match the authenticated user's id. */
+      user_id: string
+      rating: number
+    }
+  }
+  responses: {
+    /** @description Invalid input */
+    BadRequest: {
+      headers: {
+        [name: string]: unknown
+      }
+      content: {
+        'application/json': components['schemas']['Error']
+      }
+    }
+    /** @description Missing or invalid token */
+    Unauthorized: {
+      headers: {
+        [name: string]: unknown
+      }
+      content: {
+        'application/json': components['schemas']['Error']
+      }
+    }
+    /** @description Authenticated, but not allowed to act on this resource */
+    Forbidden: {
+      headers: {
+        [name: string]: unknown
+      }
+      content: {
+        'application/json': components['schemas']['Error']
+      }
+    }
+    /** @description Resource not found */
+    NotFound: {
+      headers: {
+        [name: string]: unknown
+      }
+      content: {
+        'application/json': components['schemas']['Error']
+      }
+    }
+    /** @description Deleted */
+    Deleted: {
+      headers: {
+        [name: string]: unknown
+      }
+      content: {
+        'application/json': components['schemas']['DeletedResponse']
+      }
+    }
+  }
+  parameters: {
+    /** @description MongoDB ObjectId */
+    IdParam: string
+  }
+  requestBodies: never
+  headers: never
+  pathItems: never
+}
+export type $defs = Record<string, never>
+export type operations = Record<string, never>

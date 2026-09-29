@@ -1,4 +1,5 @@
 import vuetify from 'eslint-config-vuetify'
+import eslintConfigPrettier from 'eslint-config-prettier'
 import withNuxt from './.nuxt/eslint.config.mjs'
 
 export default withNuxt(
@@ -9,4 +10,6 @@ export default withNuxt(
     // Regenerated via `npm run gen:types` - not hand-written, don't lint it.
     ignores: ['shared/types/api.d.ts'],
   },
+  // Wajib diletakkan di paling akhir agar menimpa & mematikan aturan formatting dari Vuetify / Nuxt
+  eslintConfigPrettier
 )

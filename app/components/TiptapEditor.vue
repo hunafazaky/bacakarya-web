@@ -42,36 +42,36 @@
 </template>
 
 <script setup lang="ts">
-  import StarterKit from '@tiptap/starter-kit'
-  import { Editor, EditorContent } from '@tiptap/vue-3'
+import StarterKit from '@tiptap/starter-kit'
+import { Editor, EditorContent } from '@tiptap/vue-3'
 
-  const props = defineProps<{ modelValue: string }>()
-  const emit = defineEmits<{ 'update:model-value': [value: string] }>()
+const props = defineProps<{ modelValue: string }>()
+const emit = defineEmits<{ 'update:model-value': [value: string] }>()
 
-  const editor = shallowRef<Editor>()
+const editor = shallowRef<Editor>()
 
-  onMounted(() => {
-    editor.value = new Editor({
-      content: props.modelValue,
-      extensions: [StarterKit],
-      onUpdate: ({ editor: e }) => emit('update:model-value', e.getHTML()),
-    })
+onMounted(() => {
+  editor.value = new Editor({
+    content: props.modelValue,
+    extensions: [StarterKit],
+    onUpdate: ({ editor: e }) => emit('update:model-value', e.getHTML()),
   })
+})
 
-  // Keep the editor in sync if modelValue is replaced from outside (e.g. edit
-  // page's asyncData resolving after the editor already mounted).
-  watch(
-    () => props.modelValue,
-    value => {
-      if (editor.value && value !== editor.value.getHTML()) {
-        editor.value.commands.setContent(value, { emitUpdate: false })
-      }
-    },
-  )
+// Keep the editor in sync if modelValue is replaced from outside (e.g. edit
+// page's asyncData resolving after the editor already mounted).
+watch(
+  () => props.modelValue,
+  (value) => {
+    if (editor.value && value !== editor.value.getHTML()) {
+      editor.value.commands.setContent(value, { emitUpdate: false })
+    }
+  }
+)
 
-  onBeforeUnmount(() => {
-    editor.value?.destroy()
-  })
+onBeforeUnmount(() => {
+  editor.value?.destroy()
+})
 </script>
 
 <style scoped>
