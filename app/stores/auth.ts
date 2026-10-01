@@ -85,10 +85,14 @@ export const useAuthStore = defineStore('auth', () => {
       const api = useApi()
       const res = await api<ApiEnvelope<User>>(`/users/${payload.id}`)
       user.value = res.data
-    } catch {
-      // Token expired or otherwise invalid server-side - clear it rather
-      // than staying stuck with a token that will 401 on every request.
-      logout()
+    } catch (error_: any) {
+      // Only log out when the server says the token/account is really bad.
+      // A network error or 5xx says nothing about the token - clearing the
+      // cookie then would sign users out just because of a blip. They stay
+      // on the login screen for this load, and the next load retries.
+      if ([401, 403, 404].includes(error_?.statusCode)) {
+        logout()
+      }
     }
   }
 

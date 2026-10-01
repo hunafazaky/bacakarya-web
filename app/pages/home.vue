@@ -33,13 +33,22 @@
         </v-col>
       </template>
 
-      <v-col v-else class="text-center text-medium-emphasis py-10" cols="12">
+      <v-col
+        v-else-if="!error"
+        class="text-center text-medium-emphasis py-10"
+        cols="12"
+      >
         No works yet.
       </v-col>
     </v-row>
 
     <div v-if="loading && works.length > 0" class="text-center py-6">
       <v-progress-circular color="primary" indeterminate size="24" />
+    </div>
+
+    <div v-if="error" class="text-center py-6">
+      <p class="text-medium-emphasis mb-2">Couldn't load works.</p>
+      <v-btn variant="tonal" @click="retry">Try again</v-btn>
     </div>
   </div>
 </template>
@@ -51,7 +60,7 @@ definePageMeta({ middleware: 'auth' })
 
 const auth = useAuthStore()
 const worksStore = useWorksStore()
-const { works, loading, deleteWork } = useWorkList()
+const { works, loading, error, retry, deleteWork } = useWorkList()
 
 const recommendations = ref<PopulatedWork[]>([])
 onMounted(async () => {

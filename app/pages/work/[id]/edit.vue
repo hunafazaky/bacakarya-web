@@ -134,7 +134,7 @@ function attachmentRule(file: File | File[] | null | undefined) {
 const canSubmit = computed(
   () =>
     !!form.title &&
-    !!form.text &&
+    !isRichTextEmpty(form.text) &&
     (!coverFile.value || coverFile.value.size <= COVER_MAX_BYTES) &&
     (!attachmentFile.value || attachmentFile.value.size <= ATTACHMENT_MAX_BYTES)
 )
