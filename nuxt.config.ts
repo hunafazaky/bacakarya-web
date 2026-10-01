@@ -26,6 +26,7 @@ export default defineNuxtConfig({
 
   app: {
     head: {
+      htmlAttrs: { lang: 'en' },
       link: [{ rel: 'stylesheet', href: '/layers.css' }],
     },
   },
@@ -42,18 +43,16 @@ export default defineNuxtConfig({
       ssrClientHints: {
         reloadOnFirstRequest: false,
         viewportSize: true,
-        prefersColorScheme: true,
+        // Off so the OS color scheme never overrides the light default.
+        // The theme toggle (see useAppTheme) is the only way to switch.
+        prefersColorScheme: false,
         prefersReducedMotion: true,
-
-        prefersColorSchemeOptions: {
-          useBrowserThemeOnly: false,
-        },
       },
     },
     vuetifyOptions: {
       theme: {
         // default 'system' requires `ssr: false` to avoid hydration warnings
-        defaultTheme: 'dark',
+        defaultTheme: 'light',
 
         themes: {
           // A warm, literary palette - deep forest green + amber accent,

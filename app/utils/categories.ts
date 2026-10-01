@@ -12,3 +12,27 @@ export const CATEGORIES = [
 ] as const
 
 export type Category = (typeof CATEGORIES)[number]
+
+// The values above are what the API stores and filters by, so they must stay
+// as-is. Only the text shown in the UI is translated, via this map. Unknown
+// categories (e.g. ones the classifier might add) fall back to the raw value.
+const CATEGORY_LABELS: Record<string, string> = {
+  Teknologi: 'Technology',
+  Kesehatan: 'Health',
+  Olahraga: 'Sports',
+  Travel: 'Travel',
+  Otomotif: 'Automotive',
+}
+
+export function categoryLabel(category?: string): string {
+  if (!category) {
+    return ''
+  }
+  return CATEGORY_LABELS[category] ?? category
+}
+
+// For v-select: `title` is displayed, `value` is what gets stored/sent.
+export const CATEGORY_ITEMS = CATEGORIES.map((value) => ({
+  title: categoryLabel(value),
+  value,
+}))

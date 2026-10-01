@@ -2,18 +2,18 @@
   <v-row justify="center">
     <v-col cols="12" md="9">
       <v-card>
-        <v-card-title>Tulis Karya Baru</v-card-title>
+        <v-card-title>Write a New Work</v-card-title>
 
         <v-card-text>
-          <v-text-field v-model="form.title" label="Judul" required />
+          <v-text-field v-model="form.title" label="Title" required />
 
           <v-select
             v-model="form.category"
             chips
             class="mb-4"
-            hint="Pilih kategori yang paling sesuai"
-            :items="CATEGORIES as readonly string[]"
-            label="Kategori"
+            hint="Choose the category that fits best"
+            :items="CATEGORY_ITEMS"
+            label="Category"
             multiple
             persistent-hint
           />
@@ -21,7 +21,7 @@
           <v-file-input
             v-model="coverFile"
             accept="image/*"
-            label="Cover (gambar, maks. 2MB)"
+            label="Cover (image, max 2 MB)"
             :rules="[coverRule]"
             show-size
           />
@@ -37,7 +37,7 @@
           <v-file-input
             v-model="attachmentFile"
             class="mb-2"
-            label="Lampiran (opsional, maks. 10MB)"
+            label="Attachment (optional, max 10 MB)"
             :rules="[attachmentRule]"
             show-size
           />
@@ -46,11 +46,11 @@
             v-if="attachmentFile"
             v-model="attachmentTitle"
             class="mb-4"
-            label="Judul Lampiran"
+            label="Attachment Title"
             :placeholder="attachmentFile.name"
           />
 
-          <p class="text-body-2 mb-2">Isi Tulisan</p>
+          <p class="text-body-2 mb-2">Content</p>
           <TiptapEditor v-model="form.text" />
 
           <v-alert v-if="error" class="mt-4" density="compact" type="error">
@@ -64,7 +64,7 @@
             :loading="submitting"
             @click="submit"
           >
-            Terbitkan
+            Publish
           </v-btn>
         </v-card-text>
       </v-card>
@@ -97,12 +97,13 @@ onBeforeUnmount(() => {
 
 function coverRule(file: File | File[] | null | undefined) {
   const f = Array.isArray(file) ? file[0] : file
-  if (f && f.size > COVER_MAX_BYTES) return 'Ukuran cover maksimal 2MB'
+  if (f && f.size > COVER_MAX_BYTES) return 'Cover must be 2 MB or smaller'
   return true
 }
 function attachmentRule(file: File | File[] | null | undefined) {
   const f = Array.isArray(file) ? file[0] : file
-  if (f && f.size > ATTACHMENT_MAX_BYTES) return 'Ukuran lampiran maksimal 10MB'
+  if (f && f.size > ATTACHMENT_MAX_BYTES)
+    return 'Attachment must be 10 MB or smaller'
   return true
 }
 
@@ -132,9 +133,7 @@ async function submit() {
     await navigateTo(`/work/${work.id}/read`)
   } catch (error_: any) {
     error.value =
-      error_?.statusMessage ||
-      error_?.message ||
-      'Gagal menerbitkan karya tulis'
+      error_?.statusMessage || error_?.message || 'Failed to publish the work'
   } finally {
     submitting.value = false
   }

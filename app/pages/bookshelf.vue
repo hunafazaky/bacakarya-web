@@ -15,14 +15,14 @@
           variant="text"
           @click="unlike(work.id)"
         >
-          Buang dari simpanan
+          Remove from bookshelf
         </v-btn>
       </v-col>
     </v-row>
 
     <v-row v-else justify="center">
       <v-col class="text-center text-medium-emphasis py-10" cols="12">
-        Belum ada karya tulis yang disimpan.
+        No saved works yet.
       </v-col>
     </v-row>
   </div>

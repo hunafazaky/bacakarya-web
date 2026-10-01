@@ -1,34 +1,33 @@
 <template>
   <v-row v-if="!isOwner" justify="center">
     <v-col class="text-center py-10" cols="12" md="6">
-      <p class="text-body-1">
-        Kamu tidak punya akses untuk mengedit karya tulis ini.
-      </p>
-      <v-btn class="mt-4" :to="`/work/${workId}/read`">Kembali</v-btn>
+      <p class="text-body-1">You don't have permission to edit this work.</p>
+
+      <v-btn class="mt-4" :to="`/work/${workId}/read`">Back</v-btn>
     </v-col>
   </v-row>
 
   <v-row v-else justify="center">
     <v-col cols="12" md="9">
       <v-card>
-        <v-card-title>Edit Karya Tulis</v-card-title>
+        <v-card-title>Edit Work</v-card-title>
 
         <v-card-text>
-          <v-text-field v-model="form.title" label="Judul" required />
+          <v-text-field v-model="form.title" label="Title" required />
 
           <v-select
             v-model="form.category"
             chips
             class="mb-4"
-            :items="CATEGORIES as readonly string[]"
-            label="Kategori"
+            :items="CATEGORY_ITEMS"
+            label="Category"
             multiple
           />
 
           <v-file-input
             v-model="coverFile"
             accept="image/*"
-            label="Ganti Cover (opsional, maks. 2MB)"
+            label="Replace Cover (optional, max 2 MB)"
             :rules="[coverRule]"
             show-size
           />
@@ -43,7 +42,7 @@
           <v-file-input
             v-model="attachmentFile"
             class="mb-2"
-            label="Ganti Lampiran (opsional, maks. 10MB)"
+            label="Replace Attachment (optional, max 10 MB)"
             :rules="[attachmentRule]"
             show-size
           />
@@ -52,11 +51,11 @@
             v-if="attachmentFile"
             v-model="attachmentTitle"
             class="mb-4"
-            label="Judul Lampiran"
+            label="Attachment Title"
             :placeholder="attachmentFile.name"
           />
 
-          <p class="text-body-2 mb-2">Isi Tulisan</p>
+          <p class="text-body-2 mb-2">Content</p>
           <TiptapEditor v-model="form.text" />
 
           <v-alert v-if="error" class="mt-4" density="compact" type="error">
@@ -70,7 +69,7 @@
               :loading="submitting"
               @click="submit"
             >
-              Simpan
+              Save
             </v-btn>
 
             <v-spacer />
@@ -81,7 +80,7 @@
               variant="tonal"
               @click="confirmDelete"
             >
-              Hapus
+              Delete
             </v-btn>
           </div>
         </v-card-text>
@@ -122,12 +121,13 @@ onBeforeUnmount(() => {
 
 function coverRule(file: File | File[] | null | undefined) {
   const f = Array.isArray(file) ? file[0] : file
-  if (f && f.size > COVER_MAX_BYTES) return 'Ukuran cover maksimal 2MB'
+  if (f && f.size > COVER_MAX_BYTES) return 'Cover must be 2 MB or smaller'
   return true
 }
 function attachmentRule(file: File | File[] | null | undefined) {
   const f = Array.isArray(file) ? file[0] : file
-  if (f && f.size > ATTACHMENT_MAX_BYTES) return 'Ukuran lampiran maksimal 10MB'
+  if (f && f.size > ATTACHMENT_MAX_BYTES)
+    return 'Attachment must be 10 MB or smaller'
   return true
 }
 
@@ -156,21 +156,21 @@ async function submit() {
     await navigateTo(`/work/${workId}/read`)
   } catch (error_: any) {
     error.value =
-      error_?.statusMessage || error_?.message || 'Gagal menyimpan perubahan'
+      error_?.statusMessage || error_?.message || 'Failed to save changes'
   } finally {
     submitting.value = false
   }
 }
 
 async function confirmDelete() {
-  if (!window.confirm('Apakah anda ingin menghapus karya tulis ini?')) return
+  if (!window.confirm('Are you sure you want to delete this work?')) return
   deleting.value = true
   try {
     await worksStore.remove(workId)
     await navigateTo('/home')
   } catch (error_: any) {
     error.value =
-      error_?.statusMessage || error_?.message || 'Gagal menghapus karya tulis'
+      error_?.statusMessage || error_?.message || 'Failed to delete the work'
   } finally {
     deleting.value = false
   }

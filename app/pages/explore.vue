@@ -8,7 +8,7 @@
       @update:model-value="onCategoryChange"
     >
       <v-chip v-for="cat in CATEGORIES" :key="cat" :value="cat" variant="tonal">
-        {{ cat }}
+        {{ categoryLabel(cat) }}
       </v-chip>
     </v-chip-group>
 
@@ -28,7 +28,7 @@
       </template>
 
       <v-col v-else class="text-center text-medium-emphasis py-10" cols="12">
-        Kosong.
+        Nothing here yet.
       </v-col>
     </v-row>
 

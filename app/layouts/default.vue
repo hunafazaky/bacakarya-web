@@ -6,9 +6,10 @@
 
       <!-- Desktop nav: full row of labeled buttons -->
       <template v-if="!mobile">
-        <v-btn prepend-icon="mdi-home" to="/home" variant="text">Beranda</v-btn>
+        <v-btn prepend-icon="mdi-home" to="/home" variant="text">Home</v-btn>
+
         <v-btn prepend-icon="mdi-compass" to="/explore" variant="text"
-          >Eksplorasi</v-btn
+          >Explore</v-btn
         >
 
         <v-btn
@@ -16,7 +17,7 @@
           to="/bookshelf"
           variant="text"
         >
-          Rak Buku
+          Bookshelf
         </v-btn>
 
         <v-btn
@@ -26,7 +27,7 @@
           to="/write"
           variant="tonal"
         >
-          Tulis
+          Write
         </v-btn>
       </template>
 
@@ -35,7 +36,7 @@
       <v-menu>
         <template #activator="{ props: menuProps }">
           <v-avatar v-bind="menuProps" class="cursor-pointer" size="36">
-            <AppImage size="100x100" :src="auth.user?.photo" text="Foto" />
+            <AppImage size="100x100" :src="auth.user?.photo" text="Photo" />
           </v-avatar>
         </template>
 
@@ -44,11 +45,11 @@
             prepend-icon="mdi-account"
             :to="`/user/${auth.user?.username}`"
           >
-            Profil Saya
+            My Profile
           </v-list-item>
 
           <v-list-item prepend-icon="mdi-logout" @click="onLogout">
-            Keluar
+            Log out
           </v-list-item>
         </v-list>
       </v-menu>
@@ -65,17 +66,17 @@
       <v-bottom-navigation density="comfortable" grow>
         <v-btn to="/home" value="home">
           <v-icon>mdi-home</v-icon>
-          Beranda
+          Home
         </v-btn>
 
         <v-btn to="/explore" value="explore">
           <v-icon>mdi-compass</v-icon>
-          Eksplorasi
+          Explore
         </v-btn>
 
         <v-btn to="/bookshelf" value="bookshelf">
           <v-icon>mdi-bookmark-multiple</v-icon>
-          Rak Buku
+          Bookshelf
         </v-btn>
       </v-bottom-navigation>
 

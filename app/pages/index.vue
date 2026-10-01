@@ -11,7 +11,7 @@
         <h1 class="brand-hero mb-4">Bacakarya</h1>
 
         <p class="text-h6 font-weight-regular text-medium-emphasis">
-          Tempat menulis, membaca, dan menemukan karya tulis baru.
+          A place to write, read, and discover new works.
         </p>
       </v-col>
 
@@ -20,7 +20,7 @@
 
         <v-card>
           <v-card-title>{{
-            mode === 'login' ? 'Masuk' : 'Daftar'
+            mode === 'login' ? 'Log in' : 'Sign up'
           }}</v-card-title>
 
           <v-card-text>
@@ -30,7 +30,7 @@
               <v-text-field
                 v-if="mode === 'register'"
                 v-model="form.pen_name"
-                label="Nama Pena"
+                label="Pen Name"
                 required
               />
 
@@ -46,15 +46,15 @@
               </v-alert>
 
               <v-btn block color="primary" :loading="loading" type="submit">
-                {{ mode === 'login' ? 'Masuk' : 'Daftar' }}
+                {{ mode === 'login' ? 'Log in' : 'Sign up' }}
               </v-btn>
             </v-form>
 
             <v-btn block class="mt-2" variant="text" @click="toggleMode">
               {{
                 mode === 'login'
-                  ? 'Belum punya akun? Daftar'
-                  : 'Sudah punya akun? Masuk'
+                  ? "Don't have an account? Sign up"
+                  : 'Already have an account? Log in'
               }}
             </v-btn>
           </v-card-text>
@@ -95,7 +95,7 @@ async function submit() {
     await navigateTo('/home')
   } catch (error_: any) {
     error.value =
-      error_?.statusMessage || error_?.message || 'Terjadi kesalahan'
+      error_?.statusMessage || error_?.message || 'Something went wrong'
   } finally {
     loading.value = false
   }

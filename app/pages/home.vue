@@ -1,7 +1,7 @@
 <template>
   <div>
     <template v-if="recommendations.length > 0">
-      <p class="text-overline text-medium-emphasis mb-2">Rekomendasi</p>
+      <p class="text-overline text-medium-emphasis mb-2">Recommended</p>
 
       <v-row class="mb-6">
         <v-col
@@ -16,7 +16,7 @@
       </v-row>
     </template>
 
-    <p class="text-overline text-medium-emphasis mb-2">Paling Baru</p>
+    <p class="text-overline text-medium-emphasis mb-2">Latest</p>
 
     <v-row>
       <v-col
@@ -34,7 +34,7 @@
       </template>
 
       <v-col v-else class="text-center text-medium-emphasis py-10" cols="12">
-        Belum ada karya tulis.
+        No works yet.
       </v-col>
     </v-row>
 

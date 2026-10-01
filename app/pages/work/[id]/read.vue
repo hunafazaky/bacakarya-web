@@ -18,7 +18,7 @@
 
         <v-card-text>
           <div class="mb-3">
-            <p class="text-caption font-weight-bold mb-0">Penulis</p>
+            <p class="text-caption font-weight-bold mb-0">Author</p>
 
             <NuxtLink
               class="text-decoration-none"
@@ -29,7 +29,7 @@
           </div>
 
           <div v-if="work.category?.length" class="mb-3">
-            <p class="text-caption font-weight-bold mb-0">Kategori</p>
+            <p class="text-caption font-weight-bold mb-0">Categories</p>
 
             <v-chip
               v-for="cat in work.category"
@@ -38,12 +38,12 @@
               size="small"
               variant="tonal"
             >
-              #{{ cat }}
+              #{{ categoryLabel(cat) }}
             </v-chip>
           </div>
 
           <div v-if="work.attachment?.link" class="mb-3">
-            <p class="text-caption font-weight-bold mb-0">Lampiran</p>
+            <p class="text-caption font-weight-bold mb-0">Attachment</p>
 
             <v-btn
               :href="work.attachment.link"
@@ -66,7 +66,7 @@
             <v-icon start>{{
               isLiked ? 'mdi-bookmark-remove' : 'mdi-bookmark-plus'
             }}</v-icon>
-            {{ isLiked ? 'Buang dari simpanan' : 'Simpan' }}
+            {{ isLiked ? 'Remove from bookshelf' : 'Save' }}
           </v-btn>
 
           <v-btn
@@ -81,7 +81,7 @@
           </v-btn>
 
           <div>
-            <p class="text-caption font-weight-bold mb-0">Beri rating</p>
+            <p class="text-caption font-weight-bold mb-0">Rate this work</p>
 
             <v-rating
               v-model="rating"

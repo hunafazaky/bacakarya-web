@@ -3,7 +3,7 @@
     <v-row align="center" class="mb-4">
       <v-col cols="auto">
         <v-avatar size="80">
-          <AppImage size="200x200" :src="profile.photo" text="Foto" />
+          <AppImage size="200x200" :src="profile.photo" text="Photo" />
         </v-avatar>
       </v-col>
 
@@ -22,7 +22,7 @@
       </v-col>
     </v-row>
 
-    <p class="text-overline text-medium-emphasis mb-2">Karya Tulis</p>
+    <p class="text-overline text-medium-emphasis mb-2">Works</p>
 
     <v-row v-if="ownWorks.length > 0">
       <v-col v-for="work in ownWorks" :key="work.id" cols="6" md="3" sm="4">
@@ -30,7 +30,7 @@
       </v-col>
     </v-row>
 
-    <p v-else class="text-medium-emphasis">Belum ada karya tulis.</p>
+    <p v-else class="text-medium-emphasis">No works yet.</p>
 
     <div v-if="isOwnProfile" class="mt-8">
       <v-divider class="mb-4" />
@@ -39,7 +39,7 @@
   </div>
 
   <div v-else class="text-center text-medium-emphasis py-10">
-    Pengguna tidak ditemukan.
+    User not found.
   </div>
 </template>
 
@@ -62,10 +62,10 @@ const profile = ref(res.data[0] ?? null)
 const isOwnProfile = computed(() => auth.user?.username === username)
 
 const stats = computed(() => [
-  { label: 'Karya Ditulis', value: profile.value?.work_list.length ?? 0 },
-  { label: 'Karya Dibaca', value: profile.value?.read_list.length ?? 0 },
-  { label: 'Karya Disimpan', value: profile.value?.like_list.length ?? 0 },
-  { label: 'Rating Diberikan', value: profile.value?.rate_list.length ?? 0 },
+  { label: 'Works Written', value: profile.value?.work_list.length ?? 0 },
+  { label: 'Works Read', value: profile.value?.read_list.length ?? 0 },
+  { label: 'Works Saved', value: profile.value?.like_list.length ?? 0 },
+  { label: 'Ratings Given', value: profile.value?.rate_list.length ?? 0 },
 ])
 
 // GET /users?username= populates work_list with full (raw) Work objects,

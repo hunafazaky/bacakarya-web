@@ -7,17 +7,17 @@
         v-bind="activatorProps"
         variant="tonal"
       >
-        Hapus Akun
+        Delete Account
       </v-btn>
     </template>
 
     <v-card>
-      <v-card-title>Hapus Akun?</v-card-title>
+      <v-card-title>Delete Account?</v-card-title>
 
       <v-card-text>
         <p class="mb-4">
-          Tindakan ini tidak dapat dibatalkan. Semua karya tulis yang kamu buat
-          akan ikut terhapus. Masukkan password untuk mengonfirmasi.
+          This action cannot be undone. All works you have written will be
+          deleted too. Enter your password to confirm.
         </p>
 
         <v-form @submit.prevent="submit">
@@ -33,7 +33,7 @@
 
       <v-card-actions>
         <v-spacer />
-        <v-btn variant="text" @click="close">Batal</v-btn>
+        <v-btn variant="text" @click="close">Cancel</v-btn>
 
         <v-btn
           color="error"
@@ -41,7 +41,7 @@
           :loading="loading"
           @click="submit"
         >
-          Hapus Akun
+          Delete Account
         </v-btn>
       </v-card-actions>
     </v-card>
@@ -74,8 +74,10 @@ async function submit() {
   } catch (error_: any) {
     error.value =
       error_?.statusCode === 401
-        ? 'Password salah.'
-        : error_?.statusMessage || error_?.message || 'Gagal menghapus akun.'
+        ? 'Incorrect password.'
+        : error_?.statusMessage ||
+          error_?.message ||
+          'Failed to delete account.'
   } finally {
     loading.value = false
   }

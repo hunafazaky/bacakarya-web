@@ -45,7 +45,7 @@
 
     <v-card-text v-if="work.category?.length" class="pt-0">
       <v-chip color="primary" size="x-small" variant="tonal">
-        #{{ work.category[0] }}
+        #{{ categoryLabel(work.category[0]) }}
       </v-chip>
     </v-card-text>
   </v-card>
