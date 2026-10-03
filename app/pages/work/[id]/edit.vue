@@ -2,7 +2,6 @@
   <v-row v-if="!isOwner" justify="center">
     <v-col class="text-center py-10" cols="12" md="6">
       <p class="text-body-1">You don't have permission to edit this work.</p>
-
       <v-btn class="mt-4" :to="`/work/${workId}/read`">Back</v-btn>
     </v-col>
   </v-row>
@@ -13,7 +12,13 @@
         <v-card-title>Edit Work</v-card-title>
 
         <v-card-text>
-          <v-text-field v-model="form.title" label="Title" required />
+          <v-text-field
+            v-model="form.title"
+            label="Title"
+            required
+            :rules="[titleRule]"
+            validate-on="blur"
+          />
 
           <v-select
             v-model="form.category"
@@ -62,7 +67,7 @@
             {{ error }}
           </v-alert>
 
-          <div class="d-flex mt-4">
+          <div class="d-flex align-center flex-wrap ga-3 mt-4">
             <v-btn
               color="primary"
               :disabled="!canSubmit"
@@ -71,6 +76,13 @@
             >
               Save
             </v-btn>
+
+            <span
+              v-if="missing.length > 0"
+              class="text-caption text-medium-emphasis"
+            >
+              To save, add {{ joinWithAnd(missing) }}.
+            </span>
 
             <v-spacer />
 
@@ -131,9 +143,16 @@ function attachmentRule(file: File | File[] | null | undefined) {
   return true
 }
 
+const missing = computed(() => {
+  const items: string[] = []
+  if (!form.title.trim()) items.push('a title')
+  if (isRichTextEmpty(form.text)) items.push('some content')
+  return items
+})
+
 const canSubmit = computed(
   () =>
-    !!form.title &&
+    !!form.title.trim() &&
     !isRichTextEmpty(form.text) &&
     (!coverFile.value || coverFile.value.size <= COVER_MAX_BYTES) &&
     (!attachmentFile.value || attachmentFile.value.size <= ATTACHMENT_MAX_BYTES)

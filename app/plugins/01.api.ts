@@ -4,8 +4,27 @@
 // - every bacakarya-api error response is { data: null, message } - this
 //   surfaces `message` directly on thrown errors instead of a generic
 //   "Request failed" string
-export default defineNuxtPlugin(() => {
+// - a 401 on an authenticated request means the 7-day token expired (the
+//   session-restore call is public, so it can't catch that) - log the user
+//   out and send them to the login screen instead of leaving a half-working
+//   "logged in" UI where every action fails.
+export default defineNuxtPlugin((nuxtApp) => {
   const config = useRuntimeConfig()
+
+  // For these, a 401 means "wrong password", not "expired session":
+  // - POST /users/login (bad credentials)
+  // - DELETE /users/{id} (password re-confirmation for account deletion)
+  function is401ExpectedFromUser(request: unknown, method?: string) {
+    const url = String(
+      typeof request === 'string' ? request : ((request as Request)?.url ?? '')
+    )
+    const path = url.split('?', 1)[0] ?? ''
+    const verb = (method || 'GET').toUpperCase()
+    if (path.endsWith('/users/login')) {
+      return true
+    }
+    return verb === 'DELETE' && /\/users\/[^/]+$/.test(path)
+  }
 
   const api = $fetch.create({
     baseURL: config.public.apiBase,
@@ -17,7 +36,24 @@ export default defineNuxtPlugin(() => {
         options.headers = headers
       }
     },
-    onResponseError({ response }) {
+    onResponseError({ request, options, response }) {
+      if (
+        response.status === 401 &&
+        !is401ExpectedFromUser(request, options.method)
+      ) {
+        const auth = useAuthStore()
+        // Only act if we were actually sending a token. Several requests can
+        // fail at once; after the first one logs out, the rest find no token
+        // and skip this, so the user is redirected and notified only once.
+        if (auth.token) {
+          auth.logout()
+          useNotifyStore().info('Your session expired. Please log in again.')
+          if (import.meta.client) {
+            nuxtApp.runWithContext(() => navigateTo('/'))
+          }
+        }
+      }
+
       const message =
         (response._data && response._data.message) ||
         response.statusText ||

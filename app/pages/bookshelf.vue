@@ -4,6 +4,13 @@
       <v-progress-circular color="primary" indeterminate />
     </v-row>
 
+    <v-row v-else-if="error" class="py-10" justify="center">
+      <v-col class="text-center" cols="12">
+        <p class="text-medium-emphasis mb-2">Couldn't load your bookshelf.</p>
+        <v-btn variant="tonal" @click="load">Try again</v-btn>
+      </v-col>
+    </v-row>
+
     <v-row v-else-if="works.length > 0">
       <v-col v-for="work in works" :key="work.id" cols="6" md="3" sm="4">
         <WorkCard :work="work" @delete="onDelete" />
@@ -35,15 +42,19 @@ definePageMeta({ middleware: 'auth' })
 
 const auth = useAuthStore()
 const worksStore = useWorksStore()
+const notify = useNotifyStore()
+const { removeWork } = useWorkActions()
 const api = useApi()
 
 const works = ref<PopulatedWork[]>([])
 const loading = ref(true)
+const error = ref(false)
 
 async function load() {
   const user = auth.user
   if (!user) return
   loading.value = true
+  error.value = false
   try {
     // GET /users/{id} (unlike GET /users?username=) populates one level
     // deeper: each like_list work comes back with its `writer` populated
@@ -53,19 +64,29 @@ async function load() {
       `/users/${user.id}`
     )
     works.value = res.data.like_list
+  } catch {
+    error.value = true
   } finally {
     loading.value = false
   }
 }
 
 async function unlike(id: string) {
-  await worksStore.unlike(id)
-  works.value = works.value.filter((w) => w.id !== id)
+  try {
+    await worksStore.unlike(id)
+    works.value = works.value.filter((w) => w.id !== id)
+  } catch (error_) {
+    notify.fail(
+      error_,
+      "Couldn't remove it from your bookshelf. Please try again."
+    )
+  }
 }
 
 async function onDelete(id: string) {
-  await worksStore.remove(id)
-  works.value = works.value.filter((w) => w.id !== id)
+  if (await removeWork(id)) {
+    works.value = works.value.filter((w) => w.id !== id)
+  }
 }
 
 onMounted(load)

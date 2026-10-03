@@ -94,6 +94,16 @@ export const useWorksStore = defineStore('works', () => {
       method: 'PUT',
       body: { work_id: workId, user_id: userId, rating },
     })
+    // Keep the logged-in user's rate_list in sync, so leaving and reopening
+    // a work in the same session shows the rating just given (read.vue
+    // reads its initial value from here).
+    const auth = useAuthStore()
+    if (auth.user) {
+      const list = auth.user.rate_list ?? []
+      auth.user.rate_list = list.some((r) => r.work_id === workId)
+        ? list.map((r) => (r.work_id === workId ? { ...r, rating } : r))
+        : [...list, { work_id: workId, rating }]
+    }
   }
 
   async function create(formData: FormData) {

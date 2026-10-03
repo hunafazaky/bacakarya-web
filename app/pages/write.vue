@@ -5,7 +5,13 @@
         <v-card-title>Write a New Work</v-card-title>
 
         <v-card-text>
-          <v-text-field v-model="form.title" label="Title" required />
+          <v-text-field
+            v-model="form.title"
+            label="Title"
+            required
+            :rules="[titleRule]"
+            validate-on="blur"
+          />
 
           <v-select
             v-model="form.category"
@@ -22,8 +28,9 @@
             v-model="coverFile"
             accept="image/*"
             label="Cover (image, max 2 MB)"
-            :rules="[coverRule]"
+            :rules="[coverRequiredRule, coverRule]"
             show-size
+            validate-on="blur"
           />
 
           <v-img
@@ -57,15 +64,23 @@
             {{ error }}
           </v-alert>
 
-          <v-btn
-            class="mt-4"
-            color="primary"
-            :disabled="!canSubmit"
-            :loading="submitting"
-            @click="submit"
-          >
-            Publish
-          </v-btn>
+          <div class="d-flex align-center flex-wrap ga-3 mt-4">
+            <v-btn
+              color="primary"
+              :disabled="!canSubmit"
+              :loading="submitting"
+              @click="submit"
+            >
+              Publish
+            </v-btn>
+
+            <span
+              v-if="missing.length > 0"
+              class="text-caption text-medium-emphasis"
+            >
+              To publish, add {{ joinWithAnd(missing) }}.
+            </span>
+          </div>
         </v-card-text>
       </v-card>
     </v-col>
@@ -100,6 +115,10 @@ function coverRule(file: File | File[] | null | undefined) {
   if (f && f.size > COVER_MAX_BYTES) return 'Cover must be 2 MB or smaller'
   return true
 }
+function coverRequiredRule(file: File | File[] | null | undefined) {
+  const f = Array.isArray(file) ? file[0] : file
+  return !!f || 'A cover image is required'
+}
 function attachmentRule(file: File | File[] | null | undefined) {
   const f = Array.isArray(file) ? file[0] : file
   if (f && f.size > ATTACHMENT_MAX_BYTES)
@@ -107,9 +126,19 @@ function attachmentRule(file: File | File[] | null | undefined) {
   return true
 }
 
+// What's still missing, shown next to the disabled Publish button so it
+// doesn't just sit there silently.
+const missing = computed(() => {
+  const items: string[] = []
+  if (!form.title.trim()) items.push('a title')
+  if (isRichTextEmpty(form.text)) items.push('some content')
+  if (!coverFile.value) items.push('a cover image')
+  return items
+})
+
 const canSubmit = computed(
   () =>
-    !!form.title &&
+    !!form.title.trim() &&
     !isRichTextEmpty(form.text) &&
     !!coverFile.value &&
     coverFile.value.size <= COVER_MAX_BYTES &&

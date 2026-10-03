@@ -61,6 +61,20 @@
       </v-container>
     </v-main>
 
+    <v-snackbar
+      v-model="notify.show"
+      :color="notify.color"
+      location="top"
+      multi-line
+      :timeout="5000"
+    >
+      {{ notify.message }}
+
+      <template #actions>
+        <v-btn variant="text" @click="notify.show = false">Close</v-btn>
+      </template>
+    </v-snackbar>
+
     <!-- Mobile nav: bottom bar + FAB for the primary "create" action -->
     <template v-if="auth.isLoggedIn && mobile">
       <v-bottom-navigation density="comfortable" grow>
@@ -93,6 +107,7 @@
 
 <script setup lang="ts">
 const auth = useAuthStore()
+const notify = useNotifyStore()
 const { mobile } = useDisplay()
 
 function onLogout() {

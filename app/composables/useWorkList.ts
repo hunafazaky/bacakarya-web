@@ -13,6 +13,7 @@ export function useWorkList(getCategory?: () => string | undefined) {
   // `reset()` so a dead network doesn't fire a request on every scroll.
   const error = ref(false)
   const worksStore = useWorksStore()
+  const { removeWork } = useWorkActions()
 
   // Bumped by reset()/unmount. A response that belongs to an older
   // generation is discarded, so switching category quickly can't mix the
@@ -132,10 +133,15 @@ export function useWorkList(getCategory?: () => string | undefined) {
     }
   }
 
-  async function deleteWork(id: string) {
-    await worksStore.remove(id)
+  // Resolves true if the work was deleted (failures are reported to the
+  // user by removeWork).
+  async function deleteWork(id: string): Promise<boolean> {
+    if (!(await removeWork(id))) {
+      return false
+    }
     works.value = works.value.filter((w) => w.id !== id)
     total.value = Math.max(0, total.value - 1)
+    return true
   }
 
   function onViewportChange() {

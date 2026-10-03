@@ -29,7 +29,7 @@
 
       <template v-else-if="works.length > 0">
         <v-col v-for="work in works" :key="work.id" cols="6" md="3" sm="4">
-          <WorkCard :work="work" @delete="deleteWork" />
+          <WorkCard :work="work" @delete="onDeleteLatest" />
         </v-col>
       </template>
 
@@ -60,18 +60,33 @@ definePageMeta({ middleware: 'auth' })
 
 const auth = useAuthStore()
 const worksStore = useWorksStore()
+const { removeWork } = useWorkActions()
 const { works, loading, error, retry, deleteWork } = useWorkList()
 
 const recommendations = ref<PopulatedWork[]>([])
 onMounted(async () => {
   const user = auth.user
   if (user) {
-    recommendations.value = await worksStore.fetchRecommendations(user.id)
+    try {
+      recommendations.value = await worksStore.fetchRecommendations(user.id)
+    } catch {
+      // Optional section: if it can't load, just leave it hidden.
+    }
   }
 })
 
+// A work can appear in both lists, so removing it from one removes it from
+// the other too.
+async function onDeleteLatest(id: string) {
+  if (await deleteWork(id)) {
+    recommendations.value = recommendations.value.filter((w) => w.id !== id)
+  }
+}
+
 async function onDeleteRecommendation(id: string) {
-  await worksStore.remove(id)
-  recommendations.value = recommendations.value.filter((w) => w.id !== id)
+  if (await removeWork(id)) {
+    recommendations.value = recommendations.value.filter((w) => w.id !== id)
+    works.value = works.value.filter((w) => w.id !== id)
+  }
 }
 </script>

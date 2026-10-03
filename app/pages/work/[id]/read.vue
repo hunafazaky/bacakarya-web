@@ -106,6 +106,7 @@ const route = useRoute()
 const workId = route.params.id as string
 const auth = useAuthStore()
 const worksStore = useWorksStore()
+const notify = useNotifyStore()
 
 const work = ref(await worksStore.fetchById(workId))
 const likeLoading = ref(false)
@@ -119,9 +120,11 @@ const isLiked = computed(() => {
 
 const isOwner = computed(() => auth.user?.id === work.value?.writer.id)
 
-const rating = ref(
+const initialRating =
   auth.user?.rate_list?.find((r) => r.work_id === workId)?.rating ?? 0
-)
+const rating = ref(initialRating)
+// Last rating the server accepted - restored if saving a new one fails.
+let savedRating = initialRating
 
 async function toggleLike() {
   const currentWork = work.value
@@ -131,6 +134,8 @@ async function toggleLike() {
     work.value = isLiked.value
       ? await worksStore.unlike(currentWork.id)
       : await worksStore.like(currentWork.id)
+  } catch (error_) {
+    notify.fail(error_, "Couldn't update your bookshelf. Please try again.")
   } finally {
     likeLoading.value = false
   }
@@ -140,11 +145,18 @@ async function submitRating(value: string | number) {
   const currentWork = work.value
   const user = auth.user
   if (!currentWork || !user) return
-  await worksStore.rate(currentWork.id, user.id, Number(value))
+  try {
+    await worksStore.rate(currentWork.id, user.id, Number(value))
+    savedRating = Number(value)
+  } catch (error_) {
+    rating.value = savedRating
+    notify.fail(error_, "Couldn't save your rating. Please try again.")
+  }
 }
 
 onMounted(() => {
   const currentWork = work.value
-  if (currentWork) worksStore.markRead(currentWork.id)
+  // Only bumps a read counter - not worth bothering the user if it fails.
+  if (currentWork) worksStore.markRead(currentWork.id).catch(() => {})
 })
 </script>

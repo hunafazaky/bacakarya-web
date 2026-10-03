@@ -52,7 +52,7 @@ const route = useRoute()
 const username = route.params.username as string
 const api = useApi()
 const auth = useAuthStore()
-const worksStore = useWorksStore()
+const { removeWork } = useWorkActions()
 
 const res = await api<ApiListEnvelope<User>>('/users', {
   params: { username },
@@ -90,7 +90,9 @@ const ownWorks = computed<PopulatedWork[]>(() => {
 })
 
 async function onDelete(id: string) {
-  await worksStore.remove(id)
+  if (!(await removeWork(id))) {
+    return
+  }
   if (profile.value) {
     profile.value.work_list = profile.value.work_list.filter((w) => w.id !== id)
   }
