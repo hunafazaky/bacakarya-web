@@ -4,19 +4,20 @@
 
     <v-row align="center" justify="center">
       <v-col
-        class="d-none d-md-flex flex-column justify-center pr-md-10"
+        class="d-none d-lg-flex flex-column justify-center pr-md-10"
         cols="12"
-        md="5"
+        md="8"
+        lg="5"
       >
-        <h1 class="brand-hero mb-4">Bacakarya</h1>
+        <h1 class="brand-hero mb-4 shadow">Bacakarya</h1>
 
         <p class="text-h6 font-weight-regular text-medium-emphasis">
           A place to write, read, and discover new works.
         </p>
       </v-col>
 
-      <v-col cols="12" md="4" sm="8">
-        <h1 class="brand-hero mb-6 d-md-none text-center">Bacakarya</h1>
+      <v-col cols="12" md="8" lg="5" class="auth-form-column">
+        <h1 class="brand-hero mb-6 d-lg-none text-center">Bacakarya</h1>
 
         <v-card>
           <v-card-title>{{
@@ -137,5 +138,10 @@ async function submit() {
   position: absolute;
   top: 16px;
   right: 16px;
+}
+.auth-form-column {
+  background: url('/book-image.svg') center / cover no-repeat;
+  padding: 75px 25px;
+  border-radius: 20px;
 }
 </style>
