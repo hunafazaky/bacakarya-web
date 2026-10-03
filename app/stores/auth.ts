@@ -78,6 +78,27 @@ export const useAuthStore = defineStore('auth', () => {
     logout()
   }
 
+  // PUT /users/{id}: only pen_name and photo can be changed, and `photo` is
+  // a link - the API has no profile-photo upload. Only the fields passed are
+  // sent. The response carries every list populated, which we don't need
+  // here, so just the two editable fields are merged into the user we have.
+  async function updateProfile(changes: { pen_name?: string; photo?: string }) {
+    const currentUser = user.value
+    if (!currentUser) {
+      return
+    }
+    const api = useApi()
+    const res = await api<ApiEnvelope<User>>(`/users/${currentUser.id}`, {
+      method: 'PUT',
+      body: changes,
+    })
+    user.value = {
+      ...currentUser,
+      pen_name: res.data?.pen_name ?? changes.pen_name ?? currentUser.pen_name,
+      photo: res.data?.photo ?? changes.photo ?? currentUser.photo,
+    }
+  }
+
   // Called once on app boot (see plugins/02.restore-session.ts). If a token
   // cookie survived a refresh but we don't have the user in memory yet,
   // decode the token just far enough to get the user id (no signature
@@ -123,5 +144,6 @@ export const useAuthStore = defineStore('auth', () => {
     logout,
     restoreSession,
     deleteAccount,
+    updateProfile,
   }
 })

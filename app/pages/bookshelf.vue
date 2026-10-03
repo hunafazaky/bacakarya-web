@@ -1,7 +1,7 @@
 <template>
   <div>
     <v-row v-if="loading" class="py-10" justify="center">
-      <v-progress-circular color="primary" indeterminate />
+      <AppSpinner />
     </v-row>
 
     <v-row v-else-if="error" class="py-10" justify="center">

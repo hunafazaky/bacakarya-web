@@ -14,7 +14,7 @@ export function useAppTheme() {
 
   function toggle() {
     const next = isDark.value ? 'light' : 'dark'
-    theme.global.name.value = next
+    theme.change(next)
     stored.value = next
   }
 
@@ -22,7 +22,7 @@ export function useAppTheme() {
   // very first render - no flash-then-switch.
   function applyStored() {
     if (stored.value) {
-      theme.global.name.value = stored.value
+      theme.change(stored.value)
     }
   }
 

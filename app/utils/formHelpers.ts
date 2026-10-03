@@ -10,3 +10,15 @@ export function joinWithAnd(items: string[]): string {
   }
   return `${items.slice(0, -1).join(', ')} and ${items.at(-1)}`
 }
+
+// Only http(s) links are accepted for profile photos (no data:, javascript:,
+// file: ...), so a pasted value can never become something other than an
+// ordinary image address.
+export function isHttpUrl(value: string): boolean {
+  try {
+    const url = new URL(value)
+    return url.protocol === 'http:' || url.protocol === 'https:'
+  } catch {
+    return false
+  }
+}

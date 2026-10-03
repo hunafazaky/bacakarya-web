@@ -11,6 +11,10 @@
         <h1 class="text-h5">{{ profile.pen_name }}</h1>
         <p class="text-body-2 text-medium-emphasis">@{{ profile.username }}</p>
       </v-col>
+
+      <v-col v-if="isOwnProfile" cols="12" sm="auto">
+        <EditProfileDialog @saved="syncProfile" />
+      </v-col>
     </v-row>
 
     <v-row class="mb-6">
@@ -90,6 +94,15 @@ const ownWorks = computed<PopulatedWork[]>(() => {
     } as User,
   }))
 })
+
+// After an edit, show the new name/photo here without a refetch (the works
+// below build their writer from `profile`, so they update too).
+function syncProfile() {
+  if (profile.value && auth.user) {
+    profile.value.pen_name = auth.user.pen_name
+    profile.value.photo = auth.user.photo
+  }
+}
 
 async function onDelete(id: string) {
   if (!(await removeWork(id))) {

@@ -17,7 +17,7 @@
         class="text-center py-10"
         cols="12"
       >
-        <v-progress-circular color="primary" indeterminate />
+        <AppSpinner />
       </v-col>
 
       <template v-else-if="works.length > 0">
@@ -36,7 +36,7 @@
     </v-row>
 
     <div v-if="loading && works.length > 0" class="text-center py-6">
-      <v-progress-circular color="primary" indeterminate size="24" />
+      <AppSpinner :size="24" />
     </div>
 
     <div v-if="error" class="text-center py-6">
