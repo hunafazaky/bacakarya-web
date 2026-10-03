@@ -1,8 +1,8 @@
 <template>
-  <v-container class="fill-height" fluid>
+  <v-container>
     <ThemeToggle class="theme-toggle-floating" />
 
-    <v-row align="center" class="fill-height" justify="center">
+    <v-row align="center" justify="center">
       <v-col
         class="d-none d-md-flex flex-column justify-center pr-md-10"
         cols="12"
@@ -25,17 +25,26 @@
 
           <v-card-text>
             <v-form @submit.prevent="submit">
-              <v-text-field v-model="form.username" label="Username" required />
+              <v-text-field
+                v-model="form.username"
+                autocomplete="username"
+                label="Username"
+                required
+              />
 
               <v-text-field
                 v-if="mode === 'register'"
                 v-model="form.pen_name"
+                autocomplete="nickname"
                 label="Pen Name"
                 required
               />
 
               <v-text-field
                 v-model="form.password"
+                :autocomplete="
+                  mode === 'login' ? 'current-password' : 'new-password'
+                "
                 label="Password"
                 required
                 type="password"
@@ -65,6 +74,9 @@
 </template>
 
 <script setup lang="ts">
+// Centered full-height layout (layouts/auth.vue) instead of the padded one.
+definePageMeta({ layout: 'auth' })
+
 const auth = useAuthStore()
 if (auth.isLoggedIn) {
   await navigateTo('/home')
@@ -74,6 +86,8 @@ const mode = ref<'login' | 'register'>('login')
 const loading = ref(false)
 const error = ref('')
 const form = reactive({ username: '', pen_name: '', password: '' })
+
+useHead({ title: () => (mode.value === 'login' ? 'Log in' : 'Sign up') })
 
 function toggleMode() {
   mode.value = mode.value === 'login' ? 'register' : 'login'

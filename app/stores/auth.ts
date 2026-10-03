@@ -63,7 +63,7 @@ export const useAuthStore = defineStore('auth', () => {
 
   // DELETE /users/{id} requires the current password as a second
   // confirmation factor for this irreversible action (bearer auth alone
-  // isn't enough) - see CLAUDE.md. Throws (with statusCode 401) on a wrong
+  // isn't enough). Throws (with statusCode 401) on a wrong
   // password; the caller is expected to show that inline.
   async function deleteAccount(password: string) {
     const currentUser = user.value
@@ -78,7 +78,7 @@ export const useAuthStore = defineStore('auth', () => {
     logout()
   }
 
-  // Called once on app boot (see plugins/restore-session.ts). If a token
+  // Called once on app boot (see plugins/02.restore-session.ts). If a token
   // cookie survived a refresh but we don't have the user in memory yet,
   // decode the token just far enough to get the user id (no signature
   // verification needed client-side - the server verifies it on every
@@ -97,10 +97,17 @@ export const useAuthStore = defineStore('auth', () => {
       const res = await api<ApiEnvelope<User>>(`/users/${payload.id}`)
       user.value = res.data
     } catch (error_: any) {
+      // Server asleep or unreachable: we can't tell whether the user is
+      // logged in, and showing the login page would be misleading. Rethrow so
+      // the app shows the startup page (error.vue), which reloads once the
+      // server is back.
+      if (isBackendWaking(error_)) {
+        throw error_
+      }
       // Only log out when the server says the token/account is really bad.
-      // A network error or 5xx says nothing about the token - clearing the
-      // cookie then would sign users out just because of a blip. They stay
-      // on the login screen for this load, and the next load retries.
+      // Other failures say nothing about the token - clearing the cookie
+      // then would sign users out over a blip. They stay on the login screen
+      // for this load, and the next load retries.
       if ([401, 403, 404].includes(error_?.statusCode)) {
         logout()
       }

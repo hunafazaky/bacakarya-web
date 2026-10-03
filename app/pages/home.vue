@@ -57,6 +57,7 @@
 import type { PopulatedWork } from '~~/shared/types'
 
 definePageMeta({ middleware: 'auth' })
+useHead({ title: 'Home' })
 
 const auth = useAuthStore()
 const worksStore = useWorksStore()

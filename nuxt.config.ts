@@ -4,6 +4,8 @@ export default defineNuxtConfig({
   devtools: { enabled: true },
 
   // ssr: false,
+  css: ['~/assets/styles/prose.css', '~/assets/styles/overrides.css'],
+
   modules: [
     '@nuxt/fonts',
     'vuetify-nuxt-module',
@@ -61,6 +63,10 @@ export default defineNuxtConfig({
             colors: {
               primary: '#2F6F4E',
               secondary: '#B08A3E',
+              // Vuetify picks white text for these (APCA), which is only
+              // 3.2:1 on this gold - below the 4.5:1 WCAG AA minimum. Dark
+              // text on it is 5.5:1.
+              'on-secondary': '#1E1708',
               background: '#FBF9F4',
               surface: '#FFFFFF',
             },
@@ -68,6 +74,8 @@ export default defineNuxtConfig({
           dark: {
             colors: {
               primary: '#4C9A73',
+              // White on this green is 3.4:1 (below AA); dark text is 5.4:1.
+              'on-primary': '#06180F',
               secondary: '#D4AF6A',
               background: '#14181B',
               surface: '#1D2226',

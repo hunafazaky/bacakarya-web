@@ -1,0 +1,106 @@
+/*
+ * Long-form reading text. One class used by both the reader (read.vue) and
+ * the editor (TiptapEditor), so what you write looks like what people read.
+ * Unlayered on purpose: it must win over Vuetify's layered resets.
+ */
+.prose {
+  max-width: 68ch;
+  font-family: 'Lora', Georgia, 'Times New Roman', serif;
+  font-size: 1.125rem;
+  line-height: 1.75;
+  overflow-wrap: anywhere;
+  color: rgb(var(--v-theme-on-background));
+}
+
+/* Vertical rhythm between blocks (instead of a margin on every element). */
+.prose > :first-child {
+  margin-top: 0;
+}
+.prose > * + * {
+  margin-top: 1.1em;
+}
+
+.prose h1,
+.prose h2,
+.prose h3 {
+  margin-top: 1.6em;
+  font-weight: 600;
+  line-height: 1.3;
+}
+.prose h1 {
+  font-size: 1.7em;
+}
+.prose h2 {
+  font-size: 1.4em;
+}
+.prose h3 {
+  font-size: 1.2em;
+}
+
+.prose ul,
+.prose ol {
+  padding-inline-start: 1.5em;
+}
+.prose ul {
+  list-style: disc;
+}
+.prose ol {
+  list-style: decimal;
+}
+.prose li + li {
+  margin-top: 0.35em;
+}
+.prose li > p {
+  margin: 0;
+}
+.prose li > ul,
+.prose li > ol {
+  margin-top: 0.35em;
+}
+
+.prose blockquote {
+  margin-inline: 0;
+  padding-inline-start: 1em;
+  border-inline-start: 3px solid rgb(var(--v-theme-secondary));
+  font-style: italic;
+  color: rgba(var(--v-theme-on-background), var(--v-medium-emphasis-opacity));
+}
+.prose blockquote > * + * {
+  margin-top: 0.6em;
+}
+
+.prose strong {
+  font-weight: 700;
+}
+.prose a {
+  color: rgb(var(--v-theme-primary));
+  text-underline-offset: 0.15em;
+}
+
+.prose code {
+  padding: 0.1em 0.35em;
+  border-radius: 4px;
+  font-family: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
+  font-size: 0.9em;
+  background: rgba(var(--v-theme-on-surface), 0.08);
+}
+.prose pre {
+  overflow-x: auto;
+  padding: 1em;
+  border-radius: 8px;
+  background: rgba(var(--v-theme-on-surface), 0.06);
+}
+.prose pre code {
+  padding: 0;
+  background: none;
+}
+
+.prose hr {
+  margin-block: 2em;
+  border: 0;
+  border-top: 1px solid rgba(var(--v-border-color), var(--v-border-opacity));
+}
+.prose img {
+  max-width: 100%;
+  height: auto;
+}

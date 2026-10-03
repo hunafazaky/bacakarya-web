@@ -59,6 +59,8 @@ const res = await api<ApiListEnvelope<User>>('/users', {
 })
 const profile = ref(res.data[0] ?? null)
 
+useHead({ title: () => profile.value?.pen_name ?? 'User not found' })
+
 const isOwnProfile = computed(() => auth.user?.username === username)
 
 const stats = computed(() => [

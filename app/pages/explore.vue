@@ -48,6 +48,7 @@
 
 <script setup lang="ts">
 definePageMeta({ middleware: 'auth' })
+useHead({ title: 'Explore' })
 
 const selectedCategory = ref<string | undefined>(undefined)
 const { works, loading, error, reset, retry, deleteWork } = useWorkList(

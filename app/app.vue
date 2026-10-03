@@ -1,4 +1,6 @@
 <template>
+  <NuxtLoadingIndicator color="rgb(var(--v-theme-primary))" :height="3" />
+
   <NuxtLayout>
     <NuxtPage />
   </NuxtLayout>
@@ -6,4 +8,10 @@
 
 <script setup lang="ts">
 useAppTheme().applyStored()
+
+// Browser tab title: "Explore | Bacakarya"; pages set their own part with
+// useHead({ title }).
+useHead({
+  titleTemplate: (title) => (title ? `${title} | Bacakarya` : 'Bacakarya'),
+})
 </script>

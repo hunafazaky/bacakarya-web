@@ -1,0 +1,9 @@
+/* Vuetify's default card title padding (8px on top) looks cramped on the
+   form cards (login, write, edit). Only a title that opens the card is
+   touched - Vuetify puts a hidden .v-card__loader before it - so titles
+   under an image (work cards) keep their spacing. */
+.v-card > .v-card__loader + .v-card-title,
+.v-card > .v-card-title:first-child {
+  padding-top: 16px;
+  padding-bottom: 4px;
+}

@@ -12,14 +12,24 @@
     </v-row>
 
     <v-row v-else-if="works.length > 0">
-      <v-col v-for="work in works" :key="work.id" cols="6" md="3" sm="4">
-        <WorkCard :work="work" @delete="onDelete" />
+      <!-- Column stack: the card takes the leftover height, the button sits
+           under it. (The card is height: 100%, so a plain sibling button used
+           to push past the row's bottom edge into the next row.) -->
+      <v-col
+        v-for="work in works"
+        :key="work.id"
+        class="d-flex flex-column"
+        cols="6"
+        md="3"
+        sm="4"
+      >
+        <WorkCard class="flex-grow-1" :work="work" @delete="onDelete" />
 
         <v-btn
           block
-          class="mt-1"
+          class="mt-2 flex-shrink-0"
           size="small"
-          variant="text"
+          variant="tonal"
           @click="unlike(work.id)"
         >
           Remove from bookshelf
@@ -39,6 +49,7 @@
 import type { ApiEnvelope, PopulatedWork } from '~~/shared/types'
 
 definePageMeta({ middleware: 'auth' })
+useHead({ title: 'Bookshelf' })
 
 const auth = useAuthStore()
 const worksStore = useWorksStore()

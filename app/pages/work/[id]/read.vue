@@ -1,9 +1,9 @@
 <template>
   <v-row v-if="work">
     <v-col cols="12" md="8">
-      <h1 class="text-h4 mb-4">{{ work.title }}</h1>
+      <h1 class="reader-title mb-6">{{ work.title }}</h1>
       <!-- eslint-disable-next-line vue/no-v-html -->
-      <div class="text-body-1" v-html="safeText" />
+      <div class="prose" v-html="safeText" />
     </v-col>
 
     <v-col cols="12" md="4">
@@ -21,7 +21,7 @@
             <p class="text-caption font-weight-bold mb-0">Author</p>
 
             <NuxtLink
-              class="text-decoration-none"
+              class="text-primary text-decoration-none font-weight-medium"
               :to="`/user/${work.writer.username}`"
             >
               {{ work.writer.pen_name }}
@@ -111,6 +111,8 @@ const notify = useNotifyStore()
 const work = ref(await worksStore.fetchById(workId))
 const likeLoading = ref(false)
 
+useHead({ title: () => work.value?.title })
+
 const safeText = computed(() => DOMPurify.sanitize(work.value?.text || ''))
 
 const isLiked = computed(() => {
@@ -160,3 +162,14 @@ onMounted(() => {
   if (currentWork) worksStore.markRead(currentWork.id).catch(() => {})
 })
 </script>
+
+<style scoped>
+.reader-title {
+  font-family: 'Lora', Georgia, serif;
+  font-size: clamp(1.75rem, 4vw, 2.5rem);
+  font-weight: 600;
+  line-height: 1.2;
+  text-wrap: balance;
+  overflow-wrap: anywhere;
+}
+</style>

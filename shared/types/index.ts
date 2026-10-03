@@ -1,7 +1,7 @@
 // Hand-written aliases over the generated OpenAPI types (api.d.ts).
 // Keep this file thin - anything that mirrors the API contract itself
 // belongs in the generated file, regenerated from api-reference/openapi.yaml
-// via `npm run gen:types`, not edited by hand.
+// via `bun run gen:types`, not edited by hand.
 import type { components } from './api'
 
 // The generated types mark nearly every property optional, since the

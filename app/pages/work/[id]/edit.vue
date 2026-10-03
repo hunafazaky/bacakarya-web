@@ -37,11 +37,13 @@
             show-size
           />
 
-          <v-img
+          <AppImage
             class="mb-4 rounded"
             cover
             height="200"
+            size="400x600"
             :src="coverPreview || existingWork.cover"
+            :text="existingWork.title"
           />
 
           <v-file-input
@@ -90,19 +92,30 @@
               color="error"
               :loading="deleting"
               variant="tonal"
-              @click="confirmDelete"
+              @click="confirmOpen = true"
             >
               Delete
             </v-btn>
           </div>
         </v-card-text>
       </v-card>
+
+      <ConfirmDialog
+        v-model="confirmOpen"
+        confirm-color="error"
+        confirm-text="Delete"
+        :loading="deleting"
+        :text="`“${existingWork.title}” will be permanently deleted. This can't be undone.`"
+        title="Delete this work?"
+        @confirm="confirmDelete"
+      />
     </v-col>
   </v-row>
 </template>
 
 <script setup lang="ts">
 definePageMeta({ middleware: 'auth' })
+useHead({ title: 'Edit work' })
 
 const route = useRoute()
 const workId = route.params.id as string
@@ -122,6 +135,7 @@ const attachmentFile = ref<File | null>(null)
 const attachmentTitle = ref('')
 const submitting = ref(false)
 const deleting = ref(false)
+const confirmOpen = ref(false)
 const error = ref('')
 
 const coverPreview = useObjectUrl(() => coverFile.value)
@@ -177,7 +191,6 @@ async function submit() {
 }
 
 async function confirmDelete() {
-  if (!window.confirm('Are you sure you want to delete this work?')) return
   deleting.value = true
   try {
     await worksStore.remove(workId)
@@ -187,6 +200,7 @@ async function confirmDelete() {
       error_?.statusMessage || error_?.message || 'Failed to delete the work'
   } finally {
     deleting.value = false
+    confirmOpen.value = false
   }
 }
 </script>

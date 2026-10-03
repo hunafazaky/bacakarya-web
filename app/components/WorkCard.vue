@@ -52,9 +52,18 @@
         icon="mdi-delete"
         size="x-small"
         variant="flat"
-        @click="onDelete"
+        @click="confirmOpen = true"
       />
     </div>
+
+    <ConfirmDialog
+      v-model="confirmOpen"
+      confirm-color="error"
+      confirm-text="Delete"
+      :text="deleteText"
+      title="Delete this work?"
+      @confirm="onConfirmDelete"
+    />
   </div>
 </template>
 
@@ -69,10 +78,14 @@ const emit = defineEmits<{ delete: [id: string] }>()
 const auth = useAuthStore()
 const isOwner = computed(() => auth.user?.id === props.work.writer.id)
 
-function onDelete() {
-  if (!window.confirm('Are you sure you want to delete this work?')) {
-    return
-  }
+const confirmOpen = ref(false)
+const deleteText = computed(
+  () =>
+    `“${props.work.title}” will be permanently deleted. This can't be undone.`
+)
+
+function onConfirmDelete() {
+  confirmOpen.value = false
   emit('delete', props.work.id)
 }
 </script>

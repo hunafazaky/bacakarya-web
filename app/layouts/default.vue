@@ -1,7 +1,10 @@
 <template>
   <v-app>
     <v-app-bar v-if="auth.isLoggedIn" border density="comfortable" flat>
-      <v-app-bar-title class="brand">Bacakarya</v-app-bar-title>
+      <v-app-bar-title>
+        <NuxtLink class="brand" to="/home">Bacakarya</NuxtLink>
+      </v-app-bar-title>
+
       <v-spacer />
 
       <!-- Desktop nav: full row of labeled buttons -->
@@ -35,9 +38,17 @@
 
       <v-menu>
         <template #activator="{ props: menuProps }">
-          <v-avatar v-bind="menuProps" class="cursor-pointer" size="36">
-            <AppImage size="100x100" :src="auth.user?.photo" text="Photo" />
-          </v-avatar>
+          <v-btn
+            v-bind="menuProps"
+            aria-label="Account menu"
+            icon
+            size="small"
+            variant="text"
+          >
+            <v-avatar size="36">
+              <AppImage size="100x100" :src="auth.user?.photo" text="Photo" />
+            </v-avatar>
+          </v-btn>
         </template>
 
         <v-list density="compact">
@@ -61,19 +72,7 @@
       </v-container>
     </v-main>
 
-    <v-snackbar
-      v-model="notify.show"
-      :color="notify.color"
-      location="top"
-      multi-line
-      :timeout="5000"
-    >
-      {{ notify.message }}
-
-      <template #actions>
-        <v-btn variant="text" @click="notify.show = false">Close</v-btn>
-      </template>
-    </v-snackbar>
+    <AppFeedback />
 
     <!-- Mobile nav: bottom bar + FAB for the primary "create" action -->
     <template v-if="auth.isLoggedIn && mobile">
@@ -95,6 +94,7 @@
       </v-bottom-navigation>
 
       <v-btn
+        aria-label="Write a new work"
         class="write-fab"
         color="primary"
         icon="mdi-pencil-plus"
@@ -107,7 +107,6 @@
 
 <script setup lang="ts">
 const auth = useAuthStore()
-const notify = useNotifyStore()
 const { mobile } = useDisplay()
 
 function onLogout() {
@@ -118,12 +117,15 @@ function onLogout() {
 
 <style scoped>
 .brand {
-  font-family: 'Lora', serif;
+  font-family: 'Lora', Georgia, serif;
   font-weight: 600;
+  color: inherit;
+  text-decoration: none;
 }
 .write-fab {
   position: fixed;
   right: 16px;
-  bottom: 72px;
+  /* Clear the bottom nav, plus the home-indicator area on notched phones. */
+  bottom: calc(72px + env(safe-area-inset-bottom, 0px));
 }
 </style>
