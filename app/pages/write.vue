@@ -103,12 +103,7 @@ const attachmentTitle = ref('')
 const submitting = ref(false)
 const error = ref('')
 
-const coverPreview = computed(() =>
-  coverFile.value ? URL.createObjectURL(coverFile.value) : null
-)
-onBeforeUnmount(() => {
-  if (coverPreview.value) URL.revokeObjectURL(coverPreview.value)
-})
+const coverPreview = useObjectUrl(() => coverFile.value)
 
 function coverRule(file: File | File[] | null | undefined) {
   const f = Array.isArray(file) ? file[0] : file

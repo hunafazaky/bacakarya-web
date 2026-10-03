@@ -83,6 +83,10 @@ function toggleMode() {
 async function submit() {
   loading.value = true
   error.value = ''
+  // Registration and login are two requests. If registering worked but the
+  // login after it failed, retrying must only log in - registering again
+  // would fail with "already exists" for an account that was just created.
+  let registered = false
   try {
     if (mode.value === 'register') {
       await auth.register({
@@ -90,12 +94,19 @@ async function submit() {
         pen_name: form.pen_name,
         password: form.password,
       })
+      registered = true
     }
     await auth.login({ username: form.username, password: form.password })
     await navigateTo('/home')
   } catch (error_: any) {
-    error.value =
-      error_?.statusMessage || error_?.message || 'Something went wrong'
+    if (registered) {
+      mode.value = 'login'
+      error.value =
+        'Your account was created, but logging in failed. Please log in again.'
+    } else {
+      error.value =
+        error_?.statusMessage || error_?.message || 'Something went wrong'
+    }
   } finally {
     loading.value = false
   }

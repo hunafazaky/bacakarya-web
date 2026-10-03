@@ -13,9 +13,17 @@ export const useAuthStore = defineStore('auth', () => {
   // history); that traded away "stay logged in on refresh" for simplicity
   // while a real refresh-token/cookie flow was pending on the backend -
   // superseded now that staying logged in matters more than that trade.
+  // `secure` only when the page itself is served over HTTPS: browsers drop a
+  // Secure cookie on plain http, which would silently break staying logged
+  // in on an http deployment. (On localhost browsers allow Secure either
+  // way, but there is nothing to protect there.)
+  const isHttps = import.meta.client
+    ? window.location.protocol === 'https:'
+    : useRequestURL().protocol === 'https:'
   const token = useCookie<string | null>('bacakarya_token', {
     maxAge: 60 * 60 * 24 * 7,
     sameSite: 'lax',
+    secure: isHttps,
     default: () => null,
   })
   const user = ref<User | null>(null)
@@ -48,6 +56,9 @@ export const useAuthStore = defineStore('auth', () => {
   function logout() {
     user.value = null
     token.value = null
+    // Don't keep the last-read work around for whoever uses this browser
+    // next (it also carries the like/read state of the old session).
+    useWorksStore().current = null
   }
 
   // DELETE /users/{id} requires the current password as a second

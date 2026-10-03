@@ -4,7 +4,6 @@
       v-model="selectedCategory"
       class="mb-4"
       filter
-      mandatory-false
       @update:model-value="onCategoryChange"
     >
       <v-chip v-for="cat in CATEGORIES" :key="cat" :value="cat" variant="tonal">
