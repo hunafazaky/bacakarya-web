@@ -9,9 +9,9 @@
 <script setup lang="ts">
 useAppTheme().applyStored()
 
-// Browser tab title: "Explore | Bacakarya"; pages set their own part with
+// Browser tab title: "Explore | BacaKarya"; pages set their own part with
 // useHead({ title }).
 useHead({
-  titleTemplate: (title) => (title ? `${title} | Bacakarya` : 'Bacakarya'),
+  titleTemplate: (title) => (title ? `${title} | BacaKarya` : 'BacaKarya'),
 })
 </script>

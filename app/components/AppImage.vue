@@ -13,7 +13,7 @@ const props = withDefaults(
   {
     src: null,
     size: '400x400',
-    text: 'Bacakarya',
+    text: 'BacaKarya',
   }
 )
 

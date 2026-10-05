@@ -1,6 +1,6 @@
 <template>
   <section aria-live="polite" class="waking" role="status">
-    <p class="waking-brand">Bacakarya</p>
+    <p class="waking-brand">BacaKarya</p>
 
     <h1 class="waking-title">
       {{ ready ? 'The server is ready' : 'The server is waking up' }}
@@ -16,7 +16,7 @@
     </p>
 
     <p v-else class="waking-text">
-      Bacakarya runs on a free hosting plan that pauses when nobody has used it
+      BacaKarya runs on a free hosting plan that pauses when nobody has used it
       for a while. Starting it again usually takes up to a minute.
     </p>
 

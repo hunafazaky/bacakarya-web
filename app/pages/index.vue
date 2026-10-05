@@ -9,7 +9,7 @@
         md="8"
         lg="5"
       >
-        <h1 class="brand-hero mb-4 shadow">Bacakarya</h1>
+        <h1 class="brand-hero mb-4 shadow">BacaKarya</h1>
 
         <p class="text-h6 font-weight-regular text-medium-emphasis">
           A place to write, read, and discover new works.
@@ -17,7 +17,7 @@
       </v-col>
 
       <v-col cols="12" md="8" lg="5" class="auth-form-column">
-        <h1 class="brand-hero mb-6 d-lg-none text-center">Bacakarya</h1>
+        <h1 class="brand-hero mb-6 d-lg-none text-center">BacaKarya</h1>
 
         <v-card>
           <v-card-title>{{

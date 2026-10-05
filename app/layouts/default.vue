@@ -2,7 +2,7 @@
   <v-app>
     <v-app-bar v-if="auth.isLoggedIn" border density="comfortable" flat>
       <v-app-bar-title>
-        <NuxtLink class="brand" to="/home">Bacakarya</NuxtLink>
+        <NuxtLink class="brand" to="/home">BacaKarya</NuxtLink>
       </v-app-bar-title>
 
       <v-spacer />
