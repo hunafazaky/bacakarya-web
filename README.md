@@ -1,90 +1,182 @@
-# vuetify-project
+# BacaKarya
 
-Scaffolded with Vuetify CLI.
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-## ❗️ Documentation
+BacaKarya is a Nuxt + Vuetify reading and writing platform where users can publish literary works, build a personal bookshelf, explore new content, and manage their profile in a clean, book-focused interface.
 
-- Primary docs: https://vuetifyjs.com/
-- Getting started guide: https://vuetifyjs.com/en/getting-started/installation/
-- Community support: https://community.vuetifyjs.com/
-- Issue tracker: https://issues.vuetifyjs.com/
+---
 
-## 🧱 Stack
+## 📖 Table of Contents
+- [About the Project](#about-the-project)
+- [✨ Core Features](#-core-features)
+- [🛠️ Tech Stack](#️-tech-stack)
+- [📁 Project Structure](#-project-structure)
+- [🚀 Getting Started](#-getting-started)
+- [🧪 Available Scripts](#-available-scripts)
+- [🤝 Contributing](#-contributing)
+- [📄 License](#-license)
 
-- Framework: Nuxt 4
-- UI Library: Vuetify
-- Language: TypeScript
-- Package manager: bun
+---
 
-## 🧭 Start Here
+## About the Project
 
-- Main entry: `app/app.vue`
-- Main app component: `app/app.vue`
-- Main styles: `app/assets/styles/`
-- Plugin setup: `app/plugins/`
+BacaKarya is a community-style reading platform built for writers and readers who want a focused place to publish works, organize reading lists, and discover recommendations. The app centers around user-authored stories and writing collections, with a warm editorial aesthetic and a mobile-friendly navigation flow.
+
+The frontend connects to the BacaKarya API and supports user accounts, work publishing, category browsing, profile management, and reading interactions such as marking works as read or saving them to a bookshelf.
+
+---
+
+## ✨ Core Features
+
+*   **User Authentication:** Register and log in with username-based accounts, with session restoration handled on load.
+*   **Work Publishing:** Create and publish new works with a title, category list, cover image, optional attachment, and rich-text content editor.
+*   **Reading Experience:** View individual works with reader-focused layout, metadata, and engagement actions.
+*   **Bookshelf Management:** Save works to a personal bookshelf and remove them when needed.
+*   **Explore and Discovery:** Browse recent works and category-based lists, with recommendations shown on the home screen.
+*   **Profile Pages:** View user profiles, personal stats, and authored works in one place.
+*   **Theme Toggle:** Switch between light and dark modes via a custom theme toggle.
+*   **Responsive UI:** Built with Vuetify for desktop and mobile-friendly layouts, including a bottom navigation pattern for smaller screens.
+
+---
+
+## 🛠️ Tech Stack
+
+*   **Framework:** Nuxt 4
+*   **UI Library:** Vuetify
+*   **Language:** TypeScript
+*   **State Management:** Pinia
+*   **Rich Text Editing:** Tiptap
+*   **Styling:** SCSS + Vuetify theme configuration
+*   **Package Manager:** Bun
+*   **API Integration:** Nuxt runtime config + typed OpenAPI-generated interfaces
+
+---
 
 ## 📁 Project Structure
 
-- `app/pages/` — application routes
-- `app/components/` — reusable Vue components
-- `app/assets/` — styles and static assets used in app
-- `app/plugins/` — Nuxt plugins
-- `public/` — static public files
+```text
+.
+├── app/
+│   ├── components/         # Reusable Vue components (cards, dialogs, editor, theme toggle)
+│   ├── composables/       # Shared logic for API, work lists, theme, and utility behaviors
+│   ├── layouts/           # App shell and auth layout
+│   ├── middleware/        # Auth guard middleware
+│   ├── pages/             # Route-based pages: home, explore, bookshelf, write, profile, read/edit work
+│   ├── plugins/           # API bootstrap and session restoration
+│   ├── stores/            # Pinia stores for auth, notifications, works, and backend status
+│   ├── utils/             # Form helpers, category metadata, object URL handling, and work utilities
+│   ├── app.vue            # App entry component
+│   └── error.vue          # Error page
+├── api-reference/         # OpenAPI spec for the backend API contract
+├── public/                # Static public assets
+├── shared/                # Shared TypeScript types generated from the API schema
+├── .env.example           # Example runtime environment configuration
+├── nuxt.config.ts         # Nuxt and Vuetify configuration
+├── package.json           # Scripts and dependencies
+├── LICENSE                # MIT license
+├── README.md              # Project documentation
+└── bun.lock               # Bun lockfile
+```
 
-## ✨ Enabled Features
+---
 
-- ESLint
-- Pinia
-- Vuetify MCP
-- Client Hints
+## 🚀 Getting Started
 
-## 💿 Install
+### Prerequisites
 
-Use your selected package manager (bun) to install dependencies:
+Make sure you have the following installed:
+
+*   Node.js 20+
+*   Bun
+*   A running BacaKarya API backend on `http://localhost:8080/api` (as expected by the frontend runtime config)
+
+### Installation
+
+1. Clone the repository:
+
+```bash
+git clone https://github.com/yourusername/bacakarya-web.git
+cd bacakarya-web
+```
+
+2. Install dependencies:
 
 ```bash
 bun install
 ```
 
-## 🚀 Quick Start
+3. Set up environment variables:
+
+Copy the example environment file and adjust the API base if needed.
 
 ```bash
-bun install
+cp .env.example .env
+```
+
+Example contents:
+
+```env
+NUXT_PUBLIC_API_BASE=http://localhost:8080/api
+```
+
+4. Start the application:
+
+```bash
 bun dev
 ```
 
-## 🏗️ Build
+The app should run locally in development mode, typically at:
+
+```text
+http://localhost:3000
+```
+
+If you want a production build instead:
 
 ```bash
 bun build
 ```
 
+---
+
 ## 🧪 Available Scripts
 
-- `bun build`
-- `bun dev`
-- `bun generate`
-- `bun preview`
-- `bun postinstall`
-- `bun lint`
-- `bun lint:fix`
-
-## 🤖 Vuetify MCP Server
-
-This project is configured with the Vuetify Model Context Protocol (MCP) server.
-To install and configure the MCP server for your favorite IDE (Cursor, Trae, Windsurf, VS Code, Claude Desktop, etc.) run:
-
 ```bash
-bunx @vuetify/mcp-cli
+bun dev
+bun build
+bun generate
+bun preview
+bun lint
+bun lint:fix
+bun typecheck
+bun postinstall
 ```
 
-This will open an interactive setup wizard to help you connect your AI assistant to the Vuetify ecosystem.
+Common project commands:
 
-## 💪 Support Vuetify Development
+*   `bun dev` — run the Nuxt development server
+*   `bun build` — build the production bundle
+*   `bun generate` — prerender static pages
+*   `bun preview` — preview the built site locally
+*   `bun lint` — run ESLint checks
+*   `bun typecheck` — run TypeScript validation
 
-This project uses Vuetify - an MIT licensed Open Source project. We are glad to welcome contributors and any support for ongoing development:
+---
 
-- Contribute to Vuetify and ecosystem projects: https://github.com/vuetifyjs
-- Request enterprise support: https://support.vuetifyjs.com/
-- Sponsor on GitHub: https://github.com/sponsors/vuetifyjs
-- Support on Open Collective: https://opencollective.com/vuetify
+## 🤝 Contributing
+
+Contributions are welcome. If you want to improve the app, please follow the usual workflow:
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/your-feature`)
+3. Commit your changes (`git commit -m "Add your feature"`)
+4. Push the branch (`git push origin feature/your-feature`)
+5. Open a pull request
+
+---
+
+## 📄 License
+
+This project is distributed under the MIT License. See the [LICENSE](LICENSE) file for more information.
+
+---
