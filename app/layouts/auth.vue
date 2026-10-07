@@ -20,6 +20,6 @@
   justify-content: center;
   min-height: 100vh;
   min-height: 100dvh;
-  padding: 24px 16px;
+  padding: 0;
 }
 </style>

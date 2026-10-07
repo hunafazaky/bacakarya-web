@@ -1,25 +1,16 @@
 <template>
-  <v-container>
+  <v-container class="pa-0" fluid>
     <ThemeToggle class="theme-toggle-floating" />
 
-    <v-row align="center" justify="center">
+    <v-row class="auth-row ma-0" no-gutters>
       <v-col
-        class="d-none d-lg-flex flex-column justify-center pr-md-10"
+        class="form-background d-flex flex-column justify-center"
         cols="12"
-        md="8"
-        lg="5"
+        lg="6"
       >
-        <h1 class="brand-hero mb-4 shadow">BacaKarya</h1>
-
-        <p class="text-h6 font-weight-regular text-medium-emphasis">
-          A place to write, read, and discover new works.
-        </p>
-      </v-col>
-
-      <v-col cols="12" md="8" lg="5" class="auth-form-column">
         <h1 class="brand-hero mb-6 d-lg-none text-center">BacaKarya</h1>
 
-        <v-card>
+        <v-card class="auth-card">
           <v-card-title>{{
             mode === 'login' ? 'Log in' : 'Sign up'
           }}</v-card-title>
@@ -69,6 +60,20 @@
             </v-btn>
           </v-card-text>
         </v-card>
+      </v-col>
+
+      <v-col
+        class="d-none d-lg-flex flex-column justify-center align-center pa-10"
+        cols="12"
+        lg="6"
+      >
+        <div class="auth-intro">
+          <h1 class="brand-hero mb-4 shadow">BacaKarya</h1>
+
+          <p class="text-h6 font-weight-regular text-medium-emphasis">
+            A place to write, read, and discover new works.
+          </p>
+        </div>
       </v-col>
     </v-row>
   </v-container>
@@ -129,19 +134,36 @@ async function submit() {
 </script>
 
 <style scoped>
+.auth-row {
+  min-height: 100vh;
+  min-height: 100dvh;
+}
 .brand-hero {
   font-family: 'Lora', serif;
   font-weight: 600;
   font-size: 3rem;
 }
+.auth-card,
+.auth-intro {
+  width: 100%;
+  max-width: 520px;
+  margin-inline: auto;
+}
 .theme-toggle-floating {
   position: absolute;
   top: 16px;
   right: 16px;
+  z-index: 1;
 }
-.auth-form-column {
+.form-background {
   background: url('/book-image.svg') center / cover no-repeat;
-  padding: 75px 25px;
-  border-radius: 20px;
+  min-height: 100vh;
+  min-height: 100dvh;
+  padding: 75px 32px;
+}
+@media (max-width: 959.98px) {
+  .form-background {
+    padding: 75px 24px;
+  }
 }
 </style>
